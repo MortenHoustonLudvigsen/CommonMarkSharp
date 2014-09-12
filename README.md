@@ -1,4 +1,4 @@
 CommonMarkSharp
 ===============
 
-.Net parser for CommonMark
+A CommonMark parser for .Net

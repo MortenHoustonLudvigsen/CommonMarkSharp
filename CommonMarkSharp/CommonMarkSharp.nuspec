@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>$id$</id>
+        <version>0.0.1</version>
+        <title>$title$</title>
+        <authors>$author$</authors>
+        <owners>$author$</owners>
+        <licenseUrl>https://raw.githubusercontent.com/MortenHoustonLudvigsen/CommonMarkSharp/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/MortenHoustonLudvigsen/CommonMarkSharp</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>$description$</description>
+        <releaseNotes></releaseNotes>
+        <copyright>Copyright © 2014 Morten Houston Ludvigsen, All Rights Reserved</copyright>
+        <tags>CommonMark Markdown</tags>
+    </metadata>
+    <files>
+        <file src="..\README.md" target="README.md" />
+        <file src="..\LICENSE" target="LICENSE" />
+    </files>
+</package>

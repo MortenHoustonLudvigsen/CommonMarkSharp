@@ -6,6 +6,16 @@
 *.user
 *.sln.docstates
 
+# Bower components
+bower_components/
+
+# Packed nuget package goes here:
+/NuGetPackages/
+
+# Ignore NuGet packages
+/packages/
+!packages/repositories.config
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

@@ -1,0 +1,19 @@
+{
+  "name": "CommonMarkSharp.Tests",
+  "version": "0.0.0",
+  "authors": [
+    "Morten Houston Ludvigsen <mlu@2ps.dk>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "stmd": "https://github.com/jgm/stmd.git"
+  }
+}

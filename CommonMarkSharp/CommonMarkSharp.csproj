@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E23C6254-F181-4E78-95A8-B912BCB18BB0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CommonMarkSharp</RootNamespace>
+    <AssemblyName>CommonMarkSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonMark.cs" />
+    <Compile Include="MarkupRenderer.cs" />
+    <Compile Include="Parsing\Blocks\ATXHeader.cs" />
+    <Compile Include="Parsing\Blocks\Block.cs" />
+    <Compile Include="Parsing\Blocks\BlockQuote.cs" />
+    <Compile Include="Parsing\Blocks\ContainerBlock.cs" />
+    <Compile Include="Parsing\Blocks\FencedCode.cs" />
+    <Compile Include="Parsing\Blocks\Header.cs" />
+    <Compile Include="Parsing\Blocks\HorizontalRule.cs" />
+    <Compile Include="Parsing\Blocks\Document.cs" />
+    <Compile Include="Parsing\Blocks\HtmlBlock.cs" />
+    <Compile Include="Parsing\Blocks\IndentedCode.cs" />
+    <Compile Include="Parsing\Blocks\LeafBlock.cs" />
+    <Compile Include="Parsing\Blocks\List.cs" />
+    <Compile Include="Parsing\Blocks\ListData.cs" />
+    <Compile Include="Parsing\Blocks\ListItem.cs" />
+    <Compile Include="Parsing\Blocks\Paragraph.cs" />
+    <Compile Include="Parsing\Blocks\SetextHeader.cs" />
+    <Compile Include="Parsing\CommonMarkVisitor.cs" />
+    <Compile Include="Parsing\HandleInlinesVisitor.cs" />
+    <Compile Include="Parsing\IEnumerableExtensions.cs" />
+    <Compile Include="Parsing\InlineParsers\CompositeInlineParser.cs" />
+    <Compile Include="Parsing\InlineParsers\EscapedStringParser.cs" />
+    <Compile Include="Parsing\Inlines\InlineList.cs" />
+    <Compile Include="Parsing\InlineParsers\AnyParser.cs" />
+    <Compile Include="Parsing\InlineParsers\AutolinkEmailParser.cs" />
+    <Compile Include="Parsing\InlineParsers\AutolinkParser.cs" />
+    <Compile Include="Parsing\InlineParsers\BacktickParser.cs" />
+    <Compile Include="Parsing\InlineParsers\CommonMarkInlineParser.cs" />
+    <Compile Include="Parsing\CompositeParser.cs" />
+    <Compile Include="Parsing\InlineParsers\EmphasisParser.cs" />
+    <Compile Include="Parsing\InlineParsers\EntityParser.cs" />
+    <Compile Include="Parsing\InlineParsers\ImageParser.cs" />
+    <Compile Include="Parsing\InlineParsers\ImageReferenceParser.cs" />
+    <Compile Include="Parsing\InlineParsers\InlineCodeParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LinkParser.cs" />
+    <Compile Include="Parsing\InlineParsers\InlineParser.cs" />
+    <Compile Include="Parsing\LineInfo.cs" />
+    <Compile Include="Parsing\Parsers.cs" />
+    <Compile Include="Parsing\IParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LineBreakParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LinkDestinationParser.cs" />
+    <Compile Include="Parsing\InlineParsers\EscapedCharParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LinkLabelParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LinkDefinitionParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LinkTitleParser.cs" />
+    <Compile Include="Parsing\IParserExtensions.cs" />
+    <Compile Include="Parsing\ParserContext.cs" />
+    <Compile Include="Parsing\InlineParsers\RawHtmlParser.cs" />
+    <Compile Include="Parsing\InlineParsers\LinkReferenceParser.cs" />
+    <Compile Include="Parsing\RegexParser.cs" />
+    <Compile Include="Parsing\InlineParsers\RegexStringParser.cs" />
+    <Compile Include="Parsing\Inlines\Emphasis.cs" />
+    <Compile Include="Parsing\Inlines\Image.cs" />
+    <Compile Include="Parsing\Inlines\ImageReference.cs" />
+    <Compile Include="Parsing\Inlines\LinkReference.cs" />
+    <Compile Include="Parsing\Inlines\LinkLabel.cs" />
+    <Compile Include="Parsing\Inlines\LinkTitle.cs" />
+    <Compile Include="Parsing\Inlines\Inline.cs" />
+    <Compile Include="Parsing\Inlines\InlineCode.cs" />
+    <Compile Include="Parsing\Inlines\InlineEntity.cs" />
+    <Compile Include="Parsing\Inlines\Link.cs" />
+    <Compile Include="Parsing\Inlines\HardBreak.cs" />
+    <Compile Include="Parsing\Inlines\InlineRawHtml.cs" />
+    <Compile Include="Parsing\Inlines\LineBreak.cs" />
+    <Compile Include="Parsing\Inlines\LinkDestination.cs" />
+    <Compile Include="Parsing\Blocks\LinkDefinition.cs" />
+    <Compile Include="Parsing\Inlines\StrongEmphasis.cs" />
+    <Compile Include="Parsing\InlineParsers\StrWithEntitiesParser.cs" />
+    <Compile Include="Parsing\Patterns.cs" />
+    <Compile Include="Parsing\Inlines\SoftBreak.cs" />
+    <Compile Include="Parsing\Inlines\InlineString.cs" />
+    <Compile Include="Parsing\CommonMarkParser.cs" />
+    <Compile Include="Parsing\Part.cs" />
+    <Compile Include="Parsing\Subject.cs" />
+    <Compile Include="Parsing\RegexUtils.cs" />
+    <Compile Include="PartExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="HtmlRenderer.cs" />
+    <Compile Include="TextRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Parsing\BlockParsers\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

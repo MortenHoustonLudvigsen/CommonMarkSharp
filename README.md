@@ -105,7 +105,7 @@ Document document = cm.Parse(commonMark);
 
 ### A custom renderer
 
-Once the Markdown has been parsed, it will be in a `Document` object, which is the root of an AST (abstract syntax tree), which represents the parsed Markdown. This AST can be traversed using a `CommonMarkVisitor`.
+Once the Markdown has been parsed, it will be in a `Document` object, which is the root of an AST (abstract syntax tree), representing the parsed Markdown. This AST can be traversed using a `CommonMarkVisitor`.
 
 One such `CommonMarkVisitor` is the `HtmlRenderer` class. This visitor is used for the default rendering of HTML, and conforms to the [CommonMark](http://commonmark.org/) spec.
 

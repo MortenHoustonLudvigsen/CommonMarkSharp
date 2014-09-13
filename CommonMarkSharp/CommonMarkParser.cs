@@ -44,29 +44,20 @@ namespace CommonMarkSharp
             return document;
         }
 
-        private static Regex _leadingSpaceRe = new Regex(@"\G +");
         private void ProcessLine(Document document, string line, int lineNumber)
         {
             line = ExpandTabs(line);
 
             var groups = new string[0];
-            var allMatched = true;
             var lineInfo = new LineInfo(line);
             Block container = document;
             ListData listData;
 
-            while (container.Children.Any())
+            while (container.LastChild != null && container.LastChild.IsOpen)
             {
-                var lastChild = container.LastChild;
-                if (!lastChild.IsOpen)
-                {
-                    break;
-                }
-                container = lastChild;
+                container = container.LastChild;
                 lineInfo.FindFirstNonSpace();
-                allMatched = container.MatchNextLine(lineInfo) && allMatched;
-
-                if (!allMatched)
+                if (!container.MatchNextLine(lineInfo))
                 {
                     container = container.Parent; // back up to last matching block
                     break;

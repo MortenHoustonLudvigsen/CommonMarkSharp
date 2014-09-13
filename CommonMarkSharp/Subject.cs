@@ -9,7 +9,7 @@ namespace CommonMarkSharp
 {
     public class Subject
     {
-        public const string WhiteSpace = " \t\n";
+        private static readonly string[] _emptyGroups = new string[0];
 
         public Subject(string text)
         {
@@ -52,9 +52,19 @@ namespace CommonMarkSharp
             get { return GetChar(Index + relativeIndex); }
         }
 
+        private bool ValidIndex(int index)
+        {
+            return index >= 0 && index < Text.Length;
+        }
+
         private char GetChar(int index)
         {
-            return index >= 0 && index < Text.Length ? Text[index] : char.MinValue;
+            return ValidIndex(index) ? Text[index] : char.MinValue;
+        }
+
+        public SavedSubject Save()
+        {
+            return new SavedSubject(this);
         }
 
         public int Advance(int count = 1)
@@ -64,14 +74,29 @@ namespace CommonMarkSharp
             return Index - originalIndex;
         }
 
-        public SavedSubject Save()
-        {
-            return new SavedSubject(this);
-        }
-
         public int AdvanceWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
             return Advance(CountWhile(predicate, max));
+        }
+
+        public int Advance(Regex re)
+        {
+            var groups = _emptyGroups;
+            if (IsMatch(re, out groups))
+            {
+                return Advance(groups[0].Length);
+            }
+            return 0;
+        }
+
+        public int Advance(Regex re, int relativeIndex)
+        {
+            var groups = _emptyGroups;
+            if (IsMatch(re, relativeIndex, out groups))
+            {
+                return Advance(groups[0].Length);
+            }
+            return 0;
         }
 
         public char Take()
@@ -97,6 +122,36 @@ namespace CommonMarkSharp
             return Take(CountWhile(predicate, max));
         }
 
+        public IEnumerable<char> Take(Regex re)
+        {
+            var groups = _emptyGroups;
+            return Take(re, out groups);
+        }
+
+        public IEnumerable<char> Take(Regex re, int relativeIndex)
+        {
+            var groups = _emptyGroups;
+            return Take(re, out groups);
+        }
+
+        public IEnumerable<char> Take(Regex re, out string[] groups)
+        {
+            if (IsMatch(re, out groups))
+            {
+                return groups[0];
+            }
+            return "";
+        }
+
+        public IEnumerable<char> Take(Regex re, int relativeIndex, out string[] groups)
+        {
+            if (IsMatch(re, relativeIndex, out groups))
+            {
+                return groups[0];
+            }
+            return "";
+        }
+
         public int CountWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
             var count = 0;
@@ -109,10 +164,10 @@ namespace CommonMarkSharp
             return count;
         }
 
-        public bool StartsWith(string str, int relativeIndex)
+        public bool StartsWith(string str, int relativeIndex = 0)
         {
             var index = Index + relativeIndex;
-            if (index + str.Length >= Text.Length)
+            if (index + str.Length > Text.Length)
             {
                 return false;
             }
@@ -127,26 +182,27 @@ namespace CommonMarkSharp
             return true;
         }
 
-        public bool IsMatch(string pattern, int relativeIndex)
+        public bool IsMatch(Regex re)
         {
-            string[] groups;
-            return IsMatch(pattern, relativeIndex, out groups);
-        }
-
-        public bool IsMatch(string pattern, int relativeIndex, out string[] groups)
-        {
-            return IsMatch(new Regex(@"\G" + pattern), relativeIndex, out groups);
+            return re.IsMatch(Text, Index);
         }
 
         public bool IsMatch(Regex re, int relativeIndex)
         {
-            string[] groups;
-            return IsMatch(re, relativeIndex, out groups);
+            var index = Index + relativeIndex;
+            return ValidIndex(index) ? re.IsMatch(Text, index) : false;
+        }
+
+        public bool IsMatch(Regex re, out string[] groups)
+        {
+            return re.IsMatch(Text, Index, out groups);
         }
 
         public bool IsMatch(Regex re, int relativeIndex, out string[] groups)
         {
-            return re.IsMatch(Text, Index + relativeIndex, out groups);
+            var index = Index + relativeIndex;
+            groups = _emptyGroups;
+            return ValidIndex(index) ? re.IsMatch(Text, index, out groups) : false;
         }
 
         public bool PartOfSequence(char c, int count)
@@ -172,7 +228,7 @@ namespace CommonMarkSharp
 
         public static bool IsWhiteSpace(char c)
         {
-            return WhiteSpace.Contains(c);
+            return c == ' ' || c == '\t' || c == '\n';
         }
 
         public bool IsWhiteSpace()

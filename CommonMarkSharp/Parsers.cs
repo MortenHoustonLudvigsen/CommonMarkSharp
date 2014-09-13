@@ -51,7 +51,7 @@ namespace CommonMarkSharp
         public IParser<InlineString> BacktickParser { get; set; }
         public IParser<InlineCode> InlineCodeParser { get; set; }
         public IParser<InlineString> EscapedCharParser { get; set; }
-        public IParser<InlineEntity> EntityParser { get; set; }
+        public IParser<Entity> EntityParser { get; set; }
         public IParser<Inline> EmphasisParser { get; set; }
         public IParser<Link> AutolinkParser { get; set; }
         public IParser<Link> AutolinkEmailParser { get; set; }

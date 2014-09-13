@@ -83,7 +83,7 @@
     <Compile Include="Inlines\ImageReference.cs" />
     <Compile Include="Inlines\Inline.cs" />
     <Compile Include="Inlines\InlineCode.cs" />
-    <Compile Include="Inlines\InlineEntity.cs" />
+    <Compile Include="Inlines\Entity.cs" />
     <Compile Include="Inlines\InlineList.cs" />
     <Compile Include="Inlines\InlineRawHtml.cs" />
     <Compile Include="Inlines\InlineString.cs" />

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class EntityParser : IParser<InlineEntity>
+    public class EntityParser : IParser<Entity>
     {
         private const string _alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         private const string _digits = "0123456789";
@@ -21,7 +21,7 @@ namespace CommonMarkSharp.InlineParsers
             get { return "&"; }
         }
 
-        public InlineEntity Parse(ParserContext context, Subject subject)
+        public Entity Parse(ParserContext context, Subject subject)
         {
             if (!this.CanParse(subject)) return null;
 
@@ -51,7 +51,7 @@ namespace CommonMarkSharp.InlineParsers
             if (found && subject.Char == ';')
             {
                 subject.Advance();
-                return new InlineEntity(savedSubject.GetLiteral());
+                return new Entity(savedSubject.GetLiteral());
             }
 
             savedSubject.Restore();

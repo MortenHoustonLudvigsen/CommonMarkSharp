@@ -142,9 +142,9 @@ namespace CommonMarkSharp
             Write(list.Inlines);
         }
 
-        public virtual void Visit(InlineEntity inline)
+        public virtual void Visit(Entity inline)
         {
-            Write(inline.Entity);
+            Write(inline.Value);
         }
 
         public virtual void Visit(Emphasis inline)

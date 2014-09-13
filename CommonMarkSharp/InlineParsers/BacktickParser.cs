@@ -16,7 +16,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!this.CanParse(subject)) return null;
 
-            return new InlineString(subject.TakeWhile(() => subject.Char == '`'));
+            return new InlineString(subject.TakeWhile(c => c == '`'));
         }
     }
 }

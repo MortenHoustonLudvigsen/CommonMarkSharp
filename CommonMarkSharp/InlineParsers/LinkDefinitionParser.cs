@@ -60,7 +60,7 @@ namespace CommonMarkSharp.InlineParsers
                     //}
                 }
 
-                if (subject.EndOfString || subject.Previous == '\n')
+                if (subject.EndOfString || subject[-1] == '\n')
                 {
                     return new Link(label, destination, title);
                 }

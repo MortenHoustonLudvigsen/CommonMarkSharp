@@ -22,7 +22,7 @@ namespace CommonMarkSharp.InlineParsers
                 parsers.EmphasisParser,
                 this,
                 parsers.EscapedCharParser,
-                new RegexStringParser(@"\G[^\]]")
+                new AllExceptParser(@"]", 1)
             ));
         }
 

@@ -11,39 +11,42 @@ namespace CommonMarkSharp.InlineParsers
 {
     public class LineBreakParser : IParser<LineBreak>
     {
-        private static readonly Regex _startsWithDoubleSpaceNewLine = RegexUtils.Create(@"\G  +\n");
         public string StartsWithChars { get { return "\\ \n"; } }
 
         public LineBreak Parse(ParserContext context, Subject subject)
         {
             if (!this.CanParse(subject)) return null;
 
-            string[] groups;
-            if (subject.IsMatch(_startsWithDoubleSpaceNewLine, 0, out groups))
+            var savedSubject = subject.Save();
+
+            LineBreak result = null;
+
+            if (subject.Char == ' ')
             {
-                subject.Advance(groups[0].Length);
-                subject.AdvanceWhile(c => c == ' ');
-                return new HardBreak();
+                var count = subject.AdvanceWhile(c => c == ' ');
+                if (subject.Char == '\n')
+                {
+                    result = count >= 2 ? (LineBreak)new HardBreak() : new SoftBreak();
+                }
             }
             else if (subject.StartsWith("\\\n"))
             {
                 subject.Advance(2);
-                subject.AdvanceWhile(c => c == ' ');
-                return new HardBreak();
-            }
-            else if (subject.StartsWith(" \n"))
-            {
-                subject.Advance(2);
-                subject.AdvanceWhile(c => c == ' ');
-                return new SoftBreak();
+                result = new HardBreak();
             }
             else if (subject.Char == '\n')
             {
                 subject.Advance();
-                subject.AdvanceWhile(c => c == ' ');
-                return new SoftBreak();
+                result = new SoftBreak();
             }
 
+            if (result != null)
+            {
+                subject.SkipWhiteSpace();
+                return result;
+            }
+
+            savedSubject.Restore();
             return null;
         }
     }

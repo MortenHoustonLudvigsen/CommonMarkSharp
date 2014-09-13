@@ -11,8 +11,6 @@ namespace CommonMarkSharp.InlineParsers
 {
     public class EmphasisParser : IParser<Inline>
     {
-        public static readonly Regex AlpaNumRe = RegexUtils.Create(@"\G[a-zA-Z0-9]");
-
         public EmphasisParser(Parsers parsers)
         {
             Parsers = parsers;
@@ -113,7 +111,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            if (emphChar == '_' && subject.IsMatch(AlpaNumRe, -1))
+            if (emphChar == '_' && Patterns.Alphanums.Contains(subject[-1]))
             {
                 return false;
             }
@@ -145,7 +143,7 @@ namespace CommonMarkSharp.InlineParsers
                 return false;
             }
 
-            if (emphChar == '_' && subject.IsMatch(AlpaNumRe, count))
+            if (emphChar == '_' && Patterns.Alphanums.Contains(subject[count]))
             {
                 return false;
             }

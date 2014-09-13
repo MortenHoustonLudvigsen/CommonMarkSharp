@@ -109,8 +109,6 @@
     <Compile Include="ParserContext.cs" />
     <Compile Include="InlineParsers\RawHtmlParser.cs" />
     <Compile Include="InlineParsers\LinkReferenceParser.cs" />
-    <Compile Include="RegexParser.cs" />
-    <Compile Include="InlineParsers\RegexStringParser.cs" />
     <Compile Include="InlineParsers\StrWithEntitiesParser.cs" />
     <Compile Include="Patterns.cs" />
     <Compile Include="CommonMarkParser.cs" />

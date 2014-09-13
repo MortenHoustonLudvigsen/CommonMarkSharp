@@ -11,11 +11,6 @@ namespace CommonMarkSharp.InlineParsers
 {
     public class EntityParser : IParser<Entity>
     {
-        private const string _alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        private const string _digits = "0123456789";
-        private const string _alphanums = _alphas + _digits;
-        private const string _hexDigits = _digits + "ABCDEFabcdef";
-
         public string StartsWithChars
         {
             get { return "&"; }
@@ -36,16 +31,16 @@ namespace CommonMarkSharp.InlineParsers
                 if (subject.Char == 'x' || subject.Char == 'X')
                 {
                     subject.Advance();
-                    found = subject.AdvanceWhile(c => _hexDigits.Contains(c), 8) >= 1;
+                    found = subject.AdvanceWhile(c => Patterns.HexDigits.Contains(c), 8) >= 1;
                 }
-                else if (_digits.Contains(subject.Char))
+                else if (Patterns.Digits.Contains(subject.Char))
                 {
-                    found = subject.AdvanceWhile(c => _digits.Contains(c), 8) >= 1;
+                    found = subject.AdvanceWhile(c => Patterns.Digits.Contains(c), 8) >= 1;
                 }
             }
-            else if (_alphas.Contains(subject.Char))
+            else if (Patterns.Alphas.Contains(subject.Char))
             {
-                found = subject.AdvanceWhile(c => _alphanums.Contains(c), 32) >= 2;
+                found = subject.AdvanceWhile(c => Patterns.Alphanums.Contains(c), 32) >= 2;
             }
 
             if (found && subject.Char == ';')

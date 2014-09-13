@@ -54,10 +54,6 @@ namespace CommonMarkSharp.InlineParsers
                 {
                     title = Parsers.LinkTitleParser.Parse(context, subject);
                     subject.SkipWhiteSpace();
-                    //if (title != null)
-                    //{
-                    //    subject.AdvanceWhile(c => c == ' ');
-                    //}
                 }
 
                 if (subject.EndOfString || subject[-1] == '\n')

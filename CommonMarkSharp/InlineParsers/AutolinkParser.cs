@@ -29,7 +29,7 @@ namespace CommonMarkSharp.InlineParsers
         //          'ssh'|'steam'|'svn'|'teamspeak'|'things'|'udp'|'unreal'|'ut2004'|'ventrilo'|'view-source'|
         //          'webcal'|'wtai'|'wyciwyg'|'xfire'|'xri'|'ymsgr';
 
-        private static readonly string[] _schemes = new[]
+        private static readonly HashSet<string> _schemes = new HashSet<string>(new[]
         {
             "coap", "doi", "javascript", "aaa", "aaas", "about", "acap", "cap", "cid",
             "crid", "data", "dav", "dict", "dns", "file", "ftp", "geo", "go", "gopher",
@@ -51,9 +51,9 @@ namespace CommonMarkSharp.InlineParsers
             "rmi", "rsync", "rtmp", "secondlife", "sftp", "sgn", "skype", "smb", "soldat",
             "spotify", "ssh", "steam", "svn", "teamspeak", "things", "udp", "unreal", "ut2004",
             "ventrilo", "view-source", "webcal", "wtai", "wyciwyg", "xfire", "xri", "ymsgr"
-        };
+        }, StringComparer.OrdinalIgnoreCase);
 
-        private const string _nonUriChars = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x20<>";
+        private static readonly HashSet<char> _nonUriChars = new HashSet<char>(Patterns.ControlChars + "<>");
 
         public AutolinkParser(Parsers parsers)
         {

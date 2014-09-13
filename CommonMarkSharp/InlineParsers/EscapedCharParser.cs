@@ -10,7 +10,7 @@ namespace CommonMarkSharp.InlineParsers
 {
     public class EscapedCharParser : IParser<InlineString>
     {
-        public const string PunctuationChars = @"!""#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
+        public static readonly HashSet<char> PunctuationChars = new HashSet<char>(@"!""#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
 
         public string StartsWithChars { get { return "\\"; } }
 

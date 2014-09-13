@@ -20,19 +20,22 @@ namespace CommonMarkSharp.InlineParsers
             _doubleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
-                new RegexStringParser(@"\G[^""\\]")
+                new AllExceptParser(@"""\", 1)
+                //new RegexStringParser(@"\G[^""\\]")
             ));
 
             _singleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
-                new RegexStringParser(@"\G[^'\\]")
+                new AllExceptParser(@"'\", 1)
+                //new RegexStringParser(@"\G[^'\\]")
             ));
 
             _paranthesesContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
-                new RegexStringParser(@"\G[^)\\]")
+                new AllExceptParser(@")\", 1)
+                //new RegexStringParser(@"\G[^)\\]")
             ));
         }
 

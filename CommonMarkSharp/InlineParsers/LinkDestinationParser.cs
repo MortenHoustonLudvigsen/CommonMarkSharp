@@ -21,20 +21,20 @@ namespace CommonMarkSharp.InlineParsers
             _braceContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
-                new RegexStringParser(@"\G[^<>\\]")
+                new AllExceptParser(@"<>\")
             ));
 
             _destContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
-                new RegexStringParser(@"\G[^\x00-\x20()\\]")
+                new AllExceptParser(Patterns.ControlChars + @"()\&")
             ));
 
             _destContentParserWithParantheses = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new DestParanthesesParser(_destContentParser.Value),
-                new RegexStringParser(@"\G[^\x00-\x20()\\]")
+                new AllExceptParser(Patterns.ControlChars + @"()\&")
             ));
         }
 

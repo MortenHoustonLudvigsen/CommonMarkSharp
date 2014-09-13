@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class RawHtmlParser : RegexParser<InlineRawHtml>
+    public class RawHtmlParser : RegexParser<RawHtml>
     {
         // tagname = [A-Za-z][A-Za-z0-9]*;
         public static readonly string TagName = @"[A-Za-z][A-Za-z0-9]*";
@@ -64,9 +64,9 @@ namespace CommonMarkSharp.InlineParsers
             StartsWithChars = "<";
         }
 
-        protected override InlineRawHtml HandleMatch(ParserContext context, string[] groups)
+        protected override RawHtml HandleMatch(ParserContext context, string[] groups)
         {
-            return new InlineRawHtml(groups[0]);
+            return new RawHtml(groups[0]);
         }
     }
 }

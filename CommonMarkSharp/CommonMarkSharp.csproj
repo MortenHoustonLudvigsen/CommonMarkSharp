@@ -85,7 +85,7 @@
     <Compile Include="Inlines\InlineCode.cs" />
     <Compile Include="Inlines\Entity.cs" />
     <Compile Include="Inlines\InlineList.cs" />
-    <Compile Include="Inlines\InlineRawHtml.cs" />
+    <Compile Include="Inlines\RawHtml.cs" />
     <Compile Include="Inlines\InlineString.cs" />
     <Compile Include="Inlines\LineBreak.cs" />
     <Compile Include="Inlines\Link.cs" />

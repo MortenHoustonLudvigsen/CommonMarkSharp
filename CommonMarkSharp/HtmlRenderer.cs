@@ -223,9 +223,9 @@ namespace CommonMarkSharp
             Write("<code>{0}</code>", Escape(inline.Code));
         }
 
-        public virtual void Visit(InlineRawHtml inline)
+        public virtual void Visit(RawHtml inline)
         {
-            Write(inline.Html);
+            Write(inline.Value);
         }
 
         protected virtual void WriteLine(bool force)

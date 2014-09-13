@@ -55,7 +55,7 @@ namespace CommonMarkSharp
         public IParser<Inline> EmphasisParser { get; set; }
         public IParser<Link> AutolinkParser { get; set; }
         public IParser<Link> AutolinkEmailParser { get; set; }
-        public IParser<InlineRawHtml> RawHtmlParser { get; set; }
+        public IParser<RawHtml> RawHtmlParser { get; set; }
         public IParser<Link> LinkParser { get; set; }
         public IParser<LinkReference> LinkReferenceParser { get; set; }
         public IParser<LinkLabel> LinkLabelParser { get; set; }

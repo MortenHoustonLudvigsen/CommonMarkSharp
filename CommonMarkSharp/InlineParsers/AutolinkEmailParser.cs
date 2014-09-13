@@ -20,7 +20,7 @@ namespace CommonMarkSharp.InlineParsers
         public static readonly string AutolinkEmailName = @"[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+";
         public static readonly string AutolinkEmailDomainNamePart = @"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?";
         public static readonly string AutolinkEmail = string.Format(@"{0}@{1}(?:\.{1})*", AutolinkEmailName, AutolinkEmailDomainNamePart);
-        public static readonly Regex AutolinkEmailRe = RegexUtils.Create(@"\G<({0})>", AutolinkEmail);
+        public static readonly Regex AutolinkEmailRe = new Regex(string.Format(@"\G<({0})>", AutolinkEmail), RegexUtils.Options);
 
         public AutolinkEmailParser(Parsers parsers)
             : base(AutolinkEmailRe)

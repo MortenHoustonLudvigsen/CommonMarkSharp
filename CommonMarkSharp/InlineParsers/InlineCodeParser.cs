@@ -42,16 +42,11 @@ namespace CommonMarkSharp.InlineParsers
             }
             if (codeEnded)
             {
-                return new InlineCode(NormalizeWhitespace(code));
+                return new InlineCode(RegexUtils.NormalizeWhitespace(code));
             }
 
             savedSubject.Restore();
             return null;
-        }
-
-        protected static string NormalizeWhitespace(string text)
-        {
-            return Regex.Replace(text, @"\s+", " ");
         }
     }
 }

@@ -81,7 +81,7 @@ namespace CommonMarkSharp
         public static readonly string HtmlBlockTagOpen = string.Format(@"<{0}(?:{1}|>)", BlockTagName, SpaceChar);
         public static readonly string HtmlBlockTag1 = @"<[!?]";
         public static readonly string HtmlBlockTag = RegexUtils.Join(HtmlBlockTagClose, HtmlBlockTagOpen, HtmlBlockTag1);
-        public static readonly Regex HtmlBlockTagRe = RegexUtils.Create(@"\G{0}", HtmlBlockTag);
+        public static readonly Regex HtmlBlockTagRe = new Regex(string.Format(@"\G{0}", HtmlBlockTag), RegexUtils.IgnoreCase);
 
         //// Try to match a URL in a link or reference.
         //// This may optionally be contained in <..>; otherwise
@@ -108,9 +108,10 @@ namespace CommonMarkSharp
         //// Match space characters, including newlines.
         //public static readonly Regex SpaceCharsRe = new Regex(Format(@"\G(?:{0}*)", SpaceChar), ReOptions);
 
-        //// Match ATX header start.
-        ////     [#]{1,6} ([ ]+|[\n])
-        //public static readonly Regex ATXHeaderRe = new Regex(@"\G[#]{1,6}(?: +|[\n])", ReOptions);
+        // Match ATX header start.
+        //     [#]{1,6} ([ ]+|[\n])
+        public static readonly Regex ATXHeaderRe = RegexUtils.Create(@"\G(#{1,6})(?: +|$)");
+        public static readonly Regex ATXHeaderRemoveTrailingHashRe = RegexUtils.Create(@"(?:(\\#) *#*| *#+) *$");
 
         //// Match setext header line.
         ////     [=]+ [ ]* [\n]
@@ -119,6 +120,7 @@ namespace CommonMarkSharp
         //public static readonly string SetExtHeader2 = @"-+ *\n";
         //public static readonly string SetExtHeader = Join(SetExtHeader1, SetExtHeader2);
         //public static readonly Regex SetExtHeaderRe = new Regex(Format(@"\G{0}", SetExtHeader), ReOptions);
+        public static readonly Regex SetExtHeaderRe = RegexUtils.Create(@"\G(?:=+|-+) *$");
 
         // Scan a horizontal rule line: "...three or more hyphens, asterisks,
         // or underscores on a line by themselves. If you wish, you may use
@@ -139,47 +141,7 @@ namespace CommonMarkSharp
         //public static readonly string OpenCodeFence2 = @"~{3,}/[^~\n\x00]*\n";
         //public static readonly string OpenCodeFence = Join(OpenCodeFence1, OpenCodeFence2);
         //public static readonly Regex OpenCodeFenceRe = new Regex(Format(@"\G{0}", OpenCodeFence), ReOptions);
-
-        //// Scan a closing code fence with length at least len.
-
-
-        ////extern int scan_close_code_fence(bstring s, int pos, int len)
-        ////{
-        ////  unsigned char * marker = NULL;
-        ////  unsigned char * p = &(s->data[pos]);
-        ////  unsigned char * start = p;
-        /////*!re2c
-        ////  ([`]{3,} | [~]{3,}) / spacechar* [\n]
-        ////                              { if (p - start > len) {
-        ////                                return (p - start);
-        ////                              } else {
-        ////                                return 0;
-        ////                              } }
-        ////  .? { return 0; }
-        ////*/
-        ////}
-
-        ////// Scans an entity.
-        ////// Returns number of chars matched.
-        ////extern int scan_entity(bstring s, int pos)
-        ////{
-        ////  unsigned char * marker = NULL;
-        ////  unsigned char * p = &(s->data[pos]);
-        ////  unsigned char * start = p;
-        /////*!re2c
-        ////  [&] ([#] ([Xx][A-Fa-f0-9]{1,8}|[0-9]{1,8}) |[A-Za-z][A-Za-z0-9]{1,31} ) [;]
-        ////     { return (p - start); }
-        ////  .? { return 0; }
-        ////*/
-
-        //private static string Format(string format, params string[] args)
-        //{
-        //    return string.Format(format, args);
-        //}
-
-        //private static string Join(params string[] patterns)
-        //{
-        //    return "(?:" + string.Join("|", patterns) + ")";
-        //}
+        public static readonly Regex OpenCodeFenceRe = RegexUtils.Create(@"\G(?:`{3,}(?!.*`)|~{3,}(?!.*~))");
+        public static readonly Regex CloseCodeFenceRe = RegexUtils.Create(@"\G(?:`{3,}|~{3,})(?= *$)");
     }
 }

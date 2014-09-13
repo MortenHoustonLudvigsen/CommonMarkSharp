@@ -19,7 +19,7 @@ namespace CommonMarkSharp.Inlines
 
         public string Normalize(string literal)
         {
-            return Regex.Replace(literal.Normalize(NormalizationForm.FormKD), @"\s+", " ");
+            return RegexUtils.NormalizeWhitespace(literal.Normalize(NormalizationForm.FormKD));
         }
 
         public override string ToString()

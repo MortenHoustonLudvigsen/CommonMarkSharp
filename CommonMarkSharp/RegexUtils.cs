@@ -9,7 +9,10 @@ namespace CommonMarkSharp
 {
     public static class RegexUtils
     {
-        public const RegexOptions Options = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+        //public const RegexOptions Options = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+        //public const RegexOptions Options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+        public const RegexOptions Options = RegexOptions.None;
+        public const RegexOptions IgnoreCase = Options | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
 
         public static string Join(params string[] patterns)
         {
@@ -24,16 +27,6 @@ namespace CommonMarkSharp
         public static Regex Create(string pattern, params string[] args)
         {
             return new Regex(string.Format(pattern, args), Options);
-        }
-
-        public static bool IsMatch(string input, string pattern, out string[] groups)
-        {
-            return Create(pattern).IsMatch(input, out groups);
-        }
-
-        public static bool IsMatch(string input, string pattern, int index, out string[] groups)
-        {
-            return Create(pattern).IsMatch(input, index, out groups);
         }
 
         public static bool IsMatch(this Regex re, string input, out string[] groups)
@@ -61,6 +54,13 @@ namespace CommonMarkSharp
             }
             groups = new string[] { };
             return false;
+        }
+
+
+        private static readonly Regex _normalizeWhitespaceRe = Create(@"\s+");
+        public static string NormalizeWhitespace(string text)
+        {
+            return _normalizeWhitespaceRe.Replace(text, " ");
         }
     }
 }

@@ -44,7 +44,7 @@ namespace CommonMarkSharp
             return document;
         }
 
-        private Regex _leadingSpaceRe = new Regex(@"\G +");
+        private static Regex _leadingSpaceRe = new Regex(@"\G +");
         private void ProcessLine(Document document, string line, int lineNumber)
         {
             line = ExpandTabs(line);
@@ -130,23 +130,20 @@ namespace CommonMarkSharp
                     closeUnmatchedBlocks();
                     container = document.AddBlock(this, lineNumber, new BlockQuote { StartLine = lineNumber });
                 }
-                else if (RegexUtils.IsMatch(lineInfo.Line, @"\G(#{1,6})(?: +|$)", lineInfo.FirstNonSpace, out groups))
+                else if (Patterns.ATXHeaderRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
                 {
                     // ATX header
                     lineInfo.Offset = lineInfo.FirstNonSpace + groups[0].Length;
                     closeUnmatchedBlocks();
-                    var atxHeaderLevel = groups[1].Length;
-                    var atxHeaderText = lineInfo.FromOffset;
-                    atxHeaderText = Regex.Replace(atxHeaderText, @"(?:(\\#) *#*| *#+) *$", "$1");
 
                     container = document.AddBlock(this, lineNumber, new ATXHeader(
                         groups[1].Length,
                         // remove trailing ###s:
-                        Regex.Replace(lineInfo.FromOffset, @"(?:(\\#) *#*| *#+) *$", "$1")
+                        Patterns.ATXHeaderRemoveTrailingHashRe.Replace(lineInfo.FromOffset, "$1")
                     ) { StartLine = lineNumber });
                     break;
                 }
-                else if (RegexUtils.IsMatch(lineInfo.Line, @"\G`{3,}(?!.*`)|^~{3,}(?!.*~)", lineInfo.FirstNonSpace, out groups))
+                else if (Patterns.OpenCodeFenceRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
                 {
                     // fenced code block
                     var fence_length = groups[0].Length;
@@ -170,7 +167,7 @@ namespace CommonMarkSharp
                     break;
                 }
                 else if (container is Paragraph && container.Strings.Count() == 1 &&
-                    RegexUtils.IsMatch(lineInfo.Line, @"\G(?:=+|-+) *$", lineInfo.FirstNonSpace, out groups))
+                    Patterns.SetExtHeaderRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
                 {
                     // setext header line
                     closeUnmatchedBlocks();
@@ -278,7 +275,7 @@ namespace CommonMarkSharp
                     var match =
                         lineInfo.Indent <= 3 &&
                         lineInfo[lineInfo.FirstNonSpace] == fencedCode.Char &&
-                        RegexUtils.IsMatch(lineInfo.Line, @"\G(?:`{3,}|~{3,})(?= *$)", lineInfo.FirstNonSpace, out groups);
+                        Patterns.CloseCodeFenceRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups);
 
                     if (match && groups[0].Length >= fencedCode.Length)
                     {
@@ -322,6 +319,8 @@ namespace CommonMarkSharp
             }
         }
 
+        private static Regex _bulletListMarkerRe = RegexUtils.Create(@"^[*+-]( +|$)");
+        private static Regex _orderedListMarkerRe = RegexUtils.Create(@"^(\d+)([.)])( +|$)");
         private ListData ParseListMarker(LineInfo lineInfo)
         {
             var rest = lineInfo.FromNonSpace;
@@ -332,13 +331,13 @@ namespace CommonMarkSharp
             {
                 return null;
             }
-            if (RegexUtils.IsMatch(rest, @"^[*+-]( +|$)", out groups))
+            if (_bulletListMarkerRe.IsMatch(rest, out groups))
             {
                 spaces_after_marker = groups[1].Length;
                 data.Type = "Bullet";
                 data.BulletChar = groups[0][0];
             }
-            else if (RegexUtils.IsMatch(rest, @"^(\d+)([.)])( +|$)", out groups))
+            else if (_orderedListMarkerRe.IsMatch(rest, out groups))
             {
                 spaces_after_marker = groups[3].Length;
                 data.Type = "Ordered";
@@ -389,6 +388,7 @@ namespace CommonMarkSharp
             }
         }
 
+        private static Regex _expandTabsRe = RegexUtils.Create("\t");
         private string ExpandTabs(string line)
         {
             if (!line.Contains('\t'))
@@ -396,7 +396,7 @@ namespace CommonMarkSharp
                 return line;
             }
             var lastStop = 0;
-            return Regex.Replace(line, "\t", m =>
+            return _expandTabsRe.Replace(line, m =>
             {
                 var result = new string(' ', 4 - (m.Index - lastStop) % 4);
                 lastStop = m.Index + 1;

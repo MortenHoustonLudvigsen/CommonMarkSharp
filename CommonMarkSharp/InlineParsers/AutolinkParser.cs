@@ -39,7 +39,7 @@ namespace CommonMarkSharp.InlineParsers
         // Try to match URI autolink after first <.
         //     scheme [:]([^\x00-\x20<>\\]|escaped_char)*[>]
         public static readonly string AutolinkUri = string.Format(@"{0}:{1}*", Scheme, RegexUtils.Join(@"[^\x00-\x20<>\\]", Patterns.EscapedChar));
-        public static readonly Regex AutolinkUriRe = RegexUtils.Create(@"\G<({0})>", AutolinkUri);
+        public static readonly Regex AutolinkUriRe = new Regex(string.Format(@"\G<({0})>", AutolinkUri), RegexUtils.IgnoreCase);
 
         public AutolinkParser(Parsers parsers)
             : base(AutolinkUriRe)

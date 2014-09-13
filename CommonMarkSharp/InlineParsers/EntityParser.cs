@@ -9,23 +9,53 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class EntityParser : RegexParser<InlineEntity>
+    public class EntityParser : IParser<InlineEntity>
     {
-        public const string NamedEntity = @"[A-Za-z][A-Za-z0-9]{1,31}";
-        public const string DecimalEntity = @"#[0-9]{1,8}";
-        public const string HexadecimalEntity = @"#[Xx][0-9A-Fa-f]{1,8}";
-        public static readonly string Entity = string.Format("&{0};", RegexUtils.Join(NamedEntity, DecimalEntity, HexadecimalEntity));
-        public static readonly Regex EntityRe = RegexUtils.Create(@"\G{0}", Entity);
+        private const string _alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        private const string _digits = "0123456789";
+        private const string _alphanums = _alphas + _digits;
+        private const string _hexDigits = _digits + "ABCDEFabcdef";
 
-        public EntityParser()
-            : base(EntityRe)
+        public string StartsWithChars
         {
-            StartsWithChars = "&";
+            get { return "&"; }
         }
 
-        protected override InlineEntity HandleMatch(ParserContext context, string[] groups)
+        public InlineEntity Parse(ParserContext context, Subject subject)
         {
-            return new InlineEntity(groups[0]);
+            if (!this.CanParse(subject)) return null;
+
+            var savedSubject = subject.Save();
+            subject.Advance();
+
+            var found = false;
+
+            if (subject.Char == '#')
+            {
+                subject.Advance();
+                if (subject.Char == 'x' || subject.Char == 'X')
+                {
+                    subject.Advance();
+                    found = subject.AdvanceWhile(c => _hexDigits.Contains(c), 8) >= 1;
+                }
+                else if (_digits.Contains(subject.Char))
+                {
+                    found = subject.AdvanceWhile(c => _digits.Contains(c), 8) >= 1;
+                }
+            }
+            else if (_alphas.Contains(subject.Char))
+            {
+                found = subject.AdvanceWhile(c => _alphanums.Contains(c), 32) >= 2;
+            }
+
+            if (found && subject.Char == ';')
+            {
+                subject.Advance();
+                return new InlineEntity(savedSubject.GetLiteral());
+            }
+
+            savedSubject.Restore();
+            return null;
         }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
@@ -12,10 +13,10 @@ namespace CommonMarkSharp.InlineParsers
     {
         public AnyParser(string significantChars)
         {
-            SignificantChars = string.IsNullOrEmpty(significantChars) ? new HashSet<char>(significantChars) : null;
+            SignificantChars = significantChars;
         }
 
-        public HashSet<char> SignificantChars { get; private set; }
+        public string SignificantChars { get; private set; }
         public string StartsWithChars { get { return null; } }
 
         public InlineString Parse(ParserContext context, Subject subject)

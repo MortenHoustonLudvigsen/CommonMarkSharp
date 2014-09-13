@@ -1,6 +1,5 @@
-﻿using CommonMarkSharp.Parsing;
-using CommonMarkSharp.Parsing.Blocks;
-using CommonMarkSharp.Parsing.InlineParsers;
+﻿using CommonMarkSharp.Blocks;
+using CommonMarkSharp.InlineParsers;
 using System;
 using System.Collections.Generic;
 using System.IO;

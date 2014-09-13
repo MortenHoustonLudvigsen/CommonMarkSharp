@@ -54,7 +54,6 @@ namespace CommonMarkSharp.InlineParsers
         };
 
         private const string _nonUriChars = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x20<>";
-        private static readonly string _schemeRe = RegexUtils.Join(_schemes);
 
         public AutolinkParser(Parsers parsers)
         {

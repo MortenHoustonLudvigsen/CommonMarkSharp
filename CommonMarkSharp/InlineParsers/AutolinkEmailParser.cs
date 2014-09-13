@@ -9,35 +9,88 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class AutolinkEmailParser : RegexParser<Link>
+    public class AutolinkEmailParser : IParser<Link>
     {
-        // Try to match email autolink after first <.
-        //     [a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+
-        //       [@]
-        //           [a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?
-        //       ([.][a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*
-        //       [>]
-        public static readonly string AutolinkEmailName = @"[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+";
-        public static readonly string AutolinkEmailDomainNamePart = @"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?";
-        public static readonly string AutolinkEmail = string.Format(@"{0}@{1}(?:\.{1})*", AutolinkEmailName, AutolinkEmailDomainNamePart);
-        public static readonly Regex AutolinkEmailRe = new Regex(string.Format(@"\G<({0})>", AutolinkEmail), RegexUtils.Options);
+        private const string _alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        private const string _digits = "0123456789";
+        private const string _alphanums = _alphas + _digits;
+        private const string _emailNameChars = _alphanums + ".!#$%&'*+/=?^_`{|}~-";
+        private const string _domainNameStartChars = _alphanums;
+        private const string _domainNameChars = _domainNameStartChars + "-";
 
         public AutolinkEmailParser(Parsers parsers)
-            : base(AutolinkEmailRe)
         {
             Parsers = parsers;
-            StartsWithChars = "<";
         }
 
         public Parsers Parsers { get; private set; }
+        public Lazy<IParser<InlineString>> _emailNameParser { get; private set; }
+        public Lazy<IParser<InlineString>> _domainNameParser { get; private set; }
 
-        protected override Link HandleMatch(ParserContext context, string[] groups)
+        public string StartsWithChars
         {
-            return new Link(
-                new LinkLabel(groups[1], Parsers.StrWithEntitiesParser.ParseMany(context, new Subject(groups[1]))),
-                new LinkDestination(string.Format("mailto:{0}", groups[1])),
-                new LinkTitle()
-            );
+            get { return "<"; }
+        }
+
+        public Link Parse(ParserContext context, Subject subject)
+        {
+            if (!this.CanParse(subject)) return null;
+
+            var savedSubject = subject.Save();
+            subject.Advance();
+
+            var emailStart = subject.Save();
+
+            if (MatchEmailName(subject) && subject.Char == '@')
+            {
+                subject.Advance();
+
+                if (MatchDomainName(subject) && subject.Char == '>')
+                {
+                    var email = emailStart.GetLiteral();
+                    subject.Advance();
+                    return new Link(
+                        new LinkLabel(email, new[] { new InlineString(email) }),
+                        new LinkDestination("mailto:" + email),
+                        new LinkTitle()
+                    );
+                }
+            }
+
+            savedSubject.Restore();
+            return null;
+        }
+
+        private static bool MatchEmailName(Subject subject)
+        {
+            return subject.AdvanceWhile(c => _emailNameChars.Contains(c)) > 0;
+        }
+
+        private bool MatchDomainName(Subject subject)
+        {
+            if (!MatchDomainNamePart(subject))
+            {
+                return false;
+            }
+            while (subject.Char == '.')
+            {
+                subject.Advance();
+                if (!MatchDomainNamePart(subject))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool MatchDomainNamePart(Subject subject)
+        {
+            if (!_domainNameStartChars.Contains(subject.Char))
+            {
+                return false;
+            }
+            subject.AdvanceWhile(c => _domainNameChars.Contains(c), 62);
+            return _domainNameStartChars.Contains(subject[-1]);
         }
     }
 }

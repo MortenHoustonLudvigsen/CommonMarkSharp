@@ -281,6 +281,11 @@ namespace CommonMarkSharp
             {
                 return Subject.Text.Substring(Index, Subject.Index - Index);
             }
+
+            public override string ToString()
+            {
+                return string.Format("{0}↑{1}↑{2}", Escape(Subject.Text.Substring(0, Index)), Escape(Subject.Text.Substring(Index, Subject.Index - Index)), Escape(Subject.Text.Substring(Subject.Index)));
+            }
         }
     }
 }

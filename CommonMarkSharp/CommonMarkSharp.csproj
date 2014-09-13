@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
+    <Compile Include="InlineParsers\AllParser.cs" />
     <Compile Include="MarkupRenderer.cs" />
     <Compile Include="Blocks\ATXHeader.cs" />
     <Compile Include="Blocks\Block.cs" />

@@ -33,7 +33,7 @@ namespace CommonMarkSharp.InlineParsers
 
                 LinkLabel referenceLabel;
 
-                if (subject.IsMatch(@"\G\[\]", 0))
+                if (subject.StartsWith("[]"))
                 {
                     // This is a collapsed reference link
                     subject.Advance(2);

@@ -110,31 +110,31 @@ namespace CommonMarkSharp
             return result;
         }
 
-        public IEnumerable<char> Take(int count)
+        public string Take(int count)
         {
             var result = Text.Substring(Index, count);
             Advance(count);
             return result;
         }
 
-        public IEnumerable<char> TakeWhile(Func<char, bool> predicate, int max = int.MaxValue)
+        public string TakeWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
             return Take(CountWhile(predicate, max));
         }
 
-        public IEnumerable<char> Take(Regex re)
+        public string Take(Regex re)
         {
             var groups = _emptyGroups;
             return Take(re, out groups);
         }
 
-        public IEnumerable<char> Take(Regex re, int relativeIndex)
+        public string Take(Regex re, int relativeIndex)
         {
             var groups = _emptyGroups;
             return Take(re, out groups);
         }
 
-        public IEnumerable<char> Take(Regex re, out string[] groups)
+        public string Take(Regex re, out string[] groups)
         {
             if (IsMatch(re, out groups))
             {
@@ -144,7 +144,7 @@ namespace CommonMarkSharp
             return "";
         }
 
-        public IEnumerable<char> Take(Regex re, int relativeIndex, out string[] groups)
+        public string Take(Regex re, int relativeIndex, out string[] groups)
         {
             if (IsMatch(re, relativeIndex, out groups))
             {

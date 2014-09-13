@@ -138,6 +138,7 @@ namespace CommonMarkSharp
         {
             if (IsMatch(re, out groups))
             {
+                Advance(groups[0].Length);
                 return groups[0];
             }
             return "";
@@ -147,6 +148,7 @@ namespace CommonMarkSharp
         {
             if (IsMatch(re, relativeIndex, out groups))
             {
+                Advance(groups[0].Length);
                 return groups[0];
             }
             return "";

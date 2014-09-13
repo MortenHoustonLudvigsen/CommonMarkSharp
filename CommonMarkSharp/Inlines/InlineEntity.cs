@@ -6,18 +6,13 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.Inlines
 {
-    public class InlineEntity : Inline
+    public class InlineEntity : InlineString
     {
         public InlineEntity(string entity)
+            : base(entity)
         {
-            Entity = entity;
         }
 
-        public string Entity { get; set; }
-
-        public override string ToString()
-        {
-            return Entity;
-        }
+        public string Entity { get { return Value; } }
     }
 }

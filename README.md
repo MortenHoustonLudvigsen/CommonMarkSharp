@@ -166,3 +166,15 @@ using (var writer = File.CreateText(outputFileName))
     renderer.Render(document, writer);
 }
 ```
+
+## Updating tests from the spec
+
+The tests in CommonMarkSharp.Tests are created from the [CommonMark spec](http://jgm.github.io/stmd/spec.html) using a T4 template (`CommonMarkSharp.Tests\Specs.tt`).
+
+The template creates a test for each spec in `spec.txt`, which is expected to be in the `CommonMarkSharp.Tests\bower_components\stmd` directory.
+
+To update the tests run the following in the `CommonMarkSharp.Tests` directory:
+
+    bower update
+
+After which the tests can be updated by running custom tools on `CommonMarkSharp.Tests\Specs.tt` (or just saving it in Visual Studio).

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class BacktickParser : IParser<InlineString>
+    public class BacktickParser : IInlineParser<InlineString>
     {
         public string StartsWithChars { get { return "`"; } }
 

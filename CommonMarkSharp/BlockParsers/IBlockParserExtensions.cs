@@ -5,17 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonMarkSharp
+namespace CommonMarkSharp.BlockParsers
 {
-    public static class IParserExtensions
+    public static class IBlockParserExtensions
     {
-        public static IEnumerable<T> ParseMany<T>(this IParser<T> parser, ParserContext context, string input)
+        public static IEnumerable<T> ParseMany<T>(this IBlockParser<T> parser, ParserContext context, string input)
             where T : class
         {
             return parser.ParseMany(context, new Subject(input));
         }
 
-        public static IEnumerable<T> ParseMany<T>(this IParser<T> parser, ParserContext context, Subject subject)
+        public static IEnumerable<T> ParseMany<T>(this IBlockParser<T> parser, ParserContext context, Subject subject)
             where T : class
         {
             var parts = new List<T>();

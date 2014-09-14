@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class EntityParser : IParser<Entity>
+    public class EntityParser : IInlineParser<Entity>
     {
         public string StartsWithChars
         {

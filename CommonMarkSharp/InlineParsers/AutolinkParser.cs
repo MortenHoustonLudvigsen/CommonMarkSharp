@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class AutolinkParser : IParser<Link>
+    public class AutolinkParser : IInlineParser<Link>
     {
         // scheme = 'coap'|'doi'|'javascript'|'aaa'|'aaas'|'about'|'acap'|'cap'|'cid'|'crid'|'data'|'dav'|
         //          'dict'|'dns'|'file'|'ftp'|'geo'|'go'|'gopher'|'h323'|'http'|'https'|'iax'|'icap'|'im'|
@@ -58,14 +58,14 @@ namespace CommonMarkSharp.InlineParsers
         public AutolinkParser(Parsers parsers)
         {
             Parsers = parsers;
-            _uriParser = new Lazy<IParser<InlineString>>(() => new CompositeParser<InlineString>(
+            _uriParser = new Lazy<IInlineParser<InlineString>>(() => new CompositeParser<InlineString>(
                 parsers.EntityParser,
                 new AllExceptParser(_nonUriChars)
             ));
         }
 
         public Parsers Parsers { get; private set; }
-        public Lazy<IParser<InlineString>> _uriParser { get; private set; }
+        public Lazy<IInlineParser<InlineString>> _uriParser { get; private set; }
 
         public string StartsWithChars
         {

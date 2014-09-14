@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class LinkLabelParser : IParser<LinkLabel>
+    public class LinkLabelParser : IInlineParser<LinkLabel>
     {
-        private Lazy<IParser<Inline>> _contentParser;
+        private Lazy<IInlineParser<Inline>> _contentParser;
 
         public LinkLabelParser(Parsers parsers)
         {
-            _contentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _contentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.InlineCodeParser,
                 parsers.AutolinkParser,
                 parsers.AutolinkEmailParser,
@@ -63,7 +63,7 @@ namespace CommonMarkSharp.InlineParsers
             return null;
         }
 
-        public class ContentParser : IParser<Inline>
+        public class ContentParser : IInlineParser<Inline>
         {
             public ContentParser(Parsers parsers, LinkLabelParser linkLabelParser)
             {

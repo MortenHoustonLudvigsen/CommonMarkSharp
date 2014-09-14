@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class LineBreakParser : IParser<LineBreak>
+    public class LineBreakParser : IInlineParser<LineBreak>
     {
         public string StartsWithChars { get { return "\\ \n"; } }
 

@@ -10,27 +10,27 @@ using System.Threading.Tasks;
 namespace CommonMarkSharp.InlineParsers
 {
     // TODO: Clean up
-    public class LinkDestinationParser : IParser<LinkDestination>
+    public class LinkDestinationParser : IInlineParser<LinkDestination>
     {
-        private Lazy<IParser<Inline>> _braceContentParser;
-        private Lazy<IParser<Inline>> _destContentParser;
-        private Lazy<IParser<Inline>> _destContentParserWithParantheses;
+        private Lazy<IInlineParser<Inline>> _braceContentParser;
+        private Lazy<IInlineParser<Inline>> _destContentParser;
+        private Lazy<IInlineParser<Inline>> _destContentParserWithParantheses;
 
         public LinkDestinationParser(Parsers parsers)
         {
-            _braceContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _braceContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"<>\")
             ));
 
-            _destContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _destContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(Patterns.ControlChars + @"()\&")
             ));
 
-            _destContentParserWithParantheses = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _destContentParserWithParantheses = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new DestParanthesesParser(_destContentParser.Value),
@@ -77,14 +77,14 @@ namespace CommonMarkSharp.InlineParsers
             return null;
         }
 
-        public class DestParanthesesParser : IParser<InlineList>
+        public class DestParanthesesParser : IInlineParser<InlineList>
         {
-            public DestParanthesesParser(IParser<Inline> contentParser)
+            public DestParanthesesParser(IInlineParser<Inline> contentParser)
             {
                 ContentParser = contentParser;
             }
 
-            public IParser<Inline> ContentParser { get; private set; }
+            public IInlineParser<Inline> ContentParser { get; private set; }
 
             public string StartsWithChars { get { return "("; } }
 

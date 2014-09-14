@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class ImageReferenceParser : IParser<ImageReference>
+    public class ImageReferenceParser : IInlineParser<ImageReference>
     {
         public ImageReferenceParser(Parsers parsers)
         {

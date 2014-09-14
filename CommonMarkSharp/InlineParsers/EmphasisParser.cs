@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class EmphasisParser : IParser<Inline>
+    public class EmphasisParser : IInlineParser<Inline>
     {
         public EmphasisParser(Parsers parsers)
         {

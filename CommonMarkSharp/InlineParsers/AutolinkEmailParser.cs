@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class AutolinkEmailParser : IParser<Link>
+    public class AutolinkEmailParser : IInlineParser<Link>
     {
         private const string _alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         private const string _digits = "0123456789";
@@ -24,8 +24,8 @@ namespace CommonMarkSharp.InlineParsers
         }
 
         public Parsers Parsers { get; private set; }
-        public Lazy<IParser<InlineString>> _emailNameParser { get; private set; }
-        public Lazy<IParser<InlineString>> _domainNameParser { get; private set; }
+        public Lazy<IInlineParser<InlineString>> _emailNameParser { get; private set; }
+        public Lazy<IInlineParser<InlineString>> _domainNameParser { get; private set; }
 
         public string StartsWithChars
         {

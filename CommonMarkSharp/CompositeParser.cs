@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp
 {
-    public class CompositeParser<T> : IParser<T>
+    public class CompositeParser<T> : IInlineParser<T>
         where T: class
     {
-        public CompositeParser(params IParser<T>[] parsers)
+        public CompositeParser(params IInlineParser<T>[] parsers)
         {
             _parsers = parsers.ToList();
             if (_parsers.Any(p => p.StartsWithChars == null))
@@ -25,7 +25,7 @@ namespace CommonMarkSharp
             }
         }
 
-        private readonly IEnumerable<IParser<T>> _parsers;
+        private readonly IEnumerable<IInlineParser<T>> _parsers;
 
         public virtual string StartsWithChars { get; private set; }
 

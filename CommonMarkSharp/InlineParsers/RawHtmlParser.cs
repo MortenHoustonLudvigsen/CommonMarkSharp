@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class RawHtmlParser : IParser<RawHtml>
+    public class RawHtmlParser : IInlineParser<RawHtml>
     {
         public string StartsWithChars
         {

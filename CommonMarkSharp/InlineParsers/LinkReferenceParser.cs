@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class LinkReferenceParser : IParser<LinkReference>
+    public class LinkReferenceParser : IInlineParser<LinkReference>
     {
         public LinkReferenceParser(Parsers parsers)
         {

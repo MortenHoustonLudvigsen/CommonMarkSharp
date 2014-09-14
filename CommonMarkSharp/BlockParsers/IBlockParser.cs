@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonMarkSharp
+namespace CommonMarkSharp.BlockParsers
 {
-    public interface IParser<out T>
+    public interface IBlockParser<out T>
         where T: class
     {
         string StartsWithChars { get; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class InlineParser : IParser<Inline>
+    public class InlineParser : IInlineParser<Inline>
     {
         public InlineParser(Parsers parsers)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class AllParser : IParser<InlineString>
+    public class AllParser : IInlineParser<InlineString>
     {
         public AllParser(string significantChars, int max = int.MaxValue)
             : this(new HashSet<char>(significantChars), max)

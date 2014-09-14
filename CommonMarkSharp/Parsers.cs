@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommonMarkSharp.Blocks;
+using CommonMarkSharp.BlockParsers;
 
 namespace CommonMarkSharp
 {
@@ -13,6 +14,7 @@ namespace CommonMarkSharp
     {
         public Parsers()
         {
+            // Create inline parsers
             LineBreakParser = new LineBreakParser();
             BacktickParser = new BacktickParser();
             InlineCodeParser = new InlineCodeParser();
@@ -34,29 +36,35 @@ namespace CommonMarkSharp
             EmphasisParser = new EmphasisParser(this);
             InlineParser = new InlineParser(this);
             CommonMarkInlineParser = new CommonMarkInlineParser(this);
+
+            // Create block parsers
+            IndentedCodeParser = new IndentedCodeParser();
         }
 
         // Inline parsers
-        public IParser<LineBreak> LineBreakParser { get; set; }
-        public IParser<InlineString> BacktickParser { get; set; }
-        public IParser<InlineCode> InlineCodeParser { get; set; }
-        public IParser<InlineString> EscapedCharParser { get; set; }
-        public IParser<Entity> EntityParser { get; set; }
-        public IParser<Inline> EmphasisParser { get; set; }
-        public IParser<Link> AutolinkParser { get; set; }
-        public IParser<Link> AutolinkEmailParser { get; set; }
-        public IParser<RawHtml> RawHtmlParser { get; set; }
-        public IParser<Link> LinkParser { get; set; }
-        public IParser<LinkReference> LinkReferenceParser { get; set; }
-        public IParser<LinkLabel> LinkLabelParser { get; set; }
-        public IParser<LinkDestination> LinkDestinationParser { get; set; }
-        public IParser<LinkTitle> LinkTitleParser { get; set; }
-        public IParser<Image> ImageParser { get; set; }
-        public IParser<ImageReference> ImageReferenceParser { get; set; }
-        public IParser<Inline> StrWithEntitiesParser { get; set; }
-        public IParser<Inline> EscapedStringParser { get; set; }
-        public IParser<Link> LinkDefinitionParser { get; set; }
-        public IParser<Inline> InlineParser { get; set; }
-        public IParser<Inline> CommonMarkInlineParser { get; set; }
+        public IInlineParser<LineBreak> LineBreakParser { get; set; }
+        public IInlineParser<InlineString> BacktickParser { get; set; }
+        public IInlineParser<InlineCode> InlineCodeParser { get; set; }
+        public IInlineParser<InlineString> EscapedCharParser { get; set; }
+        public IInlineParser<Entity> EntityParser { get; set; }
+        public IInlineParser<Inline> EmphasisParser { get; set; }
+        public IInlineParser<Link> AutolinkParser { get; set; }
+        public IInlineParser<Link> AutolinkEmailParser { get; set; }
+        public IInlineParser<RawHtml> RawHtmlParser { get; set; }
+        public IInlineParser<Link> LinkParser { get; set; }
+        public IInlineParser<LinkReference> LinkReferenceParser { get; set; }
+        public IInlineParser<LinkLabel> LinkLabelParser { get; set; }
+        public IInlineParser<LinkDestination> LinkDestinationParser { get; set; }
+        public IInlineParser<LinkTitle> LinkTitleParser { get; set; }
+        public IInlineParser<Image> ImageParser { get; set; }
+        public IInlineParser<ImageReference> ImageReferenceParser { get; set; }
+        public IInlineParser<Inline> StrWithEntitiesParser { get; set; }
+        public IInlineParser<Inline> EscapedStringParser { get; set; }
+        public IInlineParser<Link> LinkDefinitionParser { get; set; }
+        public IInlineParser<Inline> InlineParser { get; set; }
+        public IInlineParser<Inline> CommonMarkInlineParser { get; set; }
+
+        // Block parsers
+        public IBlockParser<IndentedCode> IndentedCodeParser { get; set; }
     }
 }

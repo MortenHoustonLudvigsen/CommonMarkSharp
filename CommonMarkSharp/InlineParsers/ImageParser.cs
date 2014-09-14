@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class ImageParser : IParser<Image>
+    public class ImageParser : IInlineParser<Image>
     {
         public ImageParser(Parsers parsers)
         {

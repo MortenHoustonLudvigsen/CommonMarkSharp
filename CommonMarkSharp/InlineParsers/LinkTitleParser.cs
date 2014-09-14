@@ -9,29 +9,29 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class LinkTitleParser : IParser<LinkTitle>
+    public class LinkTitleParser : IInlineParser<LinkTitle>
     {
-        private Lazy<IParser<Inline>> _doubleQuoteContentParser;
-        private Lazy<IParser<Inline>> _singleQuoteContentParser;
-        private Lazy<IParser<Inline>> _paranthesesContentParser;
+        private Lazy<IInlineParser<Inline>> _doubleQuoteContentParser;
+        private Lazy<IInlineParser<Inline>> _singleQuoteContentParser;
+        private Lazy<IInlineParser<Inline>> _paranthesesContentParser;
 
         public LinkTitleParser(Parsers parsers)
         {
-            _doubleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _doubleQuoteContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"""\", 1)
                 //new RegexStringParser(@"\G[^""\\]")
             ));
 
-            _singleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _singleQuoteContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"'\", 1)
                 //new RegexStringParser(@"\G[^'\\]")
             ));
 
-            _paranthesesContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
+            _paranthesesContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@")\", 1)
@@ -51,7 +51,7 @@ namespace CommonMarkSharp.InlineParsers
             if (!CanParse(subject)) return null;
 
             var endChar = char.MinValue;
-            var contentParser = (IParser<Inline>)null;
+            var contentParser = (IInlineParser<Inline>)null;
 
             if (subject.Char == '"')
             {

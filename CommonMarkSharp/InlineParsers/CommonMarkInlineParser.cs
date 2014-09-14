@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class CommonMarkInlineParser : IParser<Inline>
+    public class CommonMarkInlineParser : IInlineParser<Inline>
     {
         public CommonMarkInlineParser(Parsers parsers)
         {
             Parsers = parsers;
-            OthersParser = new Lazy<IParser<InlineString>>(() => new AllExceptParser(parsers.InlineParser.StartsWithChars));
+            OthersParser = new Lazy<IInlineParser<InlineString>>(() => new AllExceptParser(parsers.InlineParser.StartsWithChars));
         }
 
         public Parsers Parsers { get; private set; }
-        public Lazy<IParser<InlineString>> OthersParser { get; private set; }
+        public Lazy<IInlineParser<InlineString>> OthersParser { get; private set; }
 
         public string StartsWithChars
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class EscapedCharParser : IParser<InlineString>
+    public class EscapedCharParser : IInlineParser<InlineString>
     {
         public static readonly HashSet<char> PunctuationChars = new HashSet<char>(@"!""#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
 

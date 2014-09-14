@@ -1,4 +1,5 @@
 ﻿using CommonMarkSharp.Inlines;
+using CommonMarkSharp.InlineParsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

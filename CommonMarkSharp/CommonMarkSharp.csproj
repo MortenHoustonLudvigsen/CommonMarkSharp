@@ -35,6 +35,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockParsers\IBlockParser.cs" />
+    <Compile Include="BlockParsers\IBlockParserExtensions.cs" />
     <Compile Include="BlockParsers\IndentedCodeParser.cs" />
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
@@ -92,14 +94,14 @@
     <Compile Include="Inlines\SoftBreak.cs" />
     <Compile Include="Inlines\StrongEmphasis.cs" />
     <Compile Include="Parsers.cs" />
-    <Compile Include="IParser.cs" />
+    <Compile Include="InlineParsers\IInlineParser.cs" />
     <Compile Include="InlineParsers\LineBreakParser.cs" />
     <Compile Include="InlineParsers\LinkDestinationParser.cs" />
     <Compile Include="InlineParsers\EscapedCharParser.cs" />
     <Compile Include="InlineParsers\LinkLabelParser.cs" />
     <Compile Include="InlineParsers\LinkDefinitionParser.cs" />
     <Compile Include="InlineParsers\LinkTitleParser.cs" />
-    <Compile Include="IParserExtensions.cs" />
+    <Compile Include="InlineParsers\IInlineParserExtensions.cs" />
     <Compile Include="ParserContext.cs" />
     <Compile Include="InlineParsers\RawHtmlParser.cs" />
     <Compile Include="InlineParsers\LinkReferenceParser.cs" />

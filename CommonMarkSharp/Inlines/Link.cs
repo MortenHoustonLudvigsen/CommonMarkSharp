@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommonMarkSharp.Inlines
+﻿namespace CommonMarkSharp.Inlines
 {
     public class Link : Inline
     {
@@ -18,10 +12,5 @@ namespace CommonMarkSharp.Inlines
         public LinkLabel Label { get; private set; }
         public LinkDestination Destination { get; private set; }
         public LinkTitle Title { get; private set; }
-
-        public override string ToString()
-        {
-            return string.Format("[{0}]({1} {2})", Label, Destination, Title);
-        }
     }
 }

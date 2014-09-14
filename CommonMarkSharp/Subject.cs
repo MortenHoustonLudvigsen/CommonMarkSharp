@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace CommonMarkSharp
 {
@@ -79,26 +74,6 @@ namespace CommonMarkSharp
             return Advance(CountWhile(predicate, max));
         }
 
-        public int Advance(Regex re)
-        {
-            var groups = _emptyGroups;
-            if (IsMatch(re, out groups))
-            {
-                return Advance(groups[0].Length);
-            }
-            return 0;
-        }
-
-        public int Advance(Regex re, int relativeIndex)
-        {
-            var groups = _emptyGroups;
-            if (IsMatch(re, relativeIndex, out groups))
-            {
-                return Advance(groups[0].Length);
-            }
-            return 0;
-        }
-
         public char Take()
         {
             if (EndOfString)
@@ -120,38 +95,6 @@ namespace CommonMarkSharp
         public string TakeWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
             return Take(CountWhile(predicate, max));
-        }
-
-        public string Take(Regex re)
-        {
-            var groups = _emptyGroups;
-            return Take(re, out groups);
-        }
-
-        public string Take(Regex re, int relativeIndex)
-        {
-            var groups = _emptyGroups;
-            return Take(re, out groups);
-        }
-
-        public string Take(Regex re, out string[] groups)
-        {
-            if (IsMatch(re, out groups))
-            {
-                Advance(groups[0].Length);
-                return groups[0];
-            }
-            return "";
-        }
-
-        public string Take(Regex re, int relativeIndex, out string[] groups)
-        {
-            if (IsMatch(re, relativeIndex, out groups))
-            {
-                Advance(groups[0].Length);
-                return groups[0];
-            }
-            return "";
         }
 
         public int CountWhile(Func<char, bool> predicate, int max = int.MaxValue)
@@ -182,29 +125,6 @@ namespace CommonMarkSharp
                 }
             }
             return true;
-        }
-
-        public bool IsMatch(Regex re)
-        {
-            return re.IsMatch(Text, Index);
-        }
-
-        public bool IsMatch(Regex re, int relativeIndex)
-        {
-            var index = Index + relativeIndex;
-            return ValidIndex(index) ? re.IsMatch(Text, index) : false;
-        }
-
-        public bool IsMatch(Regex re, out string[] groups)
-        {
-            return re.IsMatch(Text, Index, out groups);
-        }
-
-        public bool IsMatch(Regex re, int relativeIndex, out string[] groups)
-        {
-            var index = Index + relativeIndex;
-            groups = _emptyGroups;
-            return ValidIndex(index) ? re.IsMatch(Text, index, out groups) : false;
         }
 
         public bool PartOfSequence(char c, int count)
@@ -243,6 +163,8 @@ namespace CommonMarkSharp
             return IsWhiteSpace(this[relativeIndex]);
         }
 
+        #if DEBUG
+        
         public override string ToString()
         {
             return string.Format("{0}↑{1}", Escape(Text.Substring(0, Index)), Escape(Text.Substring(Index)));
@@ -260,6 +182,8 @@ namespace CommonMarkSharp
                 .Replace("\t", "\\t")
                 .Replace("\v", "\\v");
         }
+
+        #endif
 
         public class SavedSubject
         {
@@ -282,10 +206,14 @@ namespace CommonMarkSharp
                 return Subject.Text.Substring(Index, Subject.Index - Index);
             }
 
+            #if DEBUG
+
             public override string ToString()
             {
                 return string.Format("{0}↑{1}↑{2}", Escape(Subject.Text.Substring(0, Index)), Escape(Subject.Text.Substring(Index, Subject.Index - Index)), Escape(Subject.Text.Substring(Subject.Index)));
             }
+
+            #endif
         }
     }
 }

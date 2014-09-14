@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommonMarkSharp.Inlines
 {
@@ -19,10 +16,5 @@ namespace CommonMarkSharp.Inlines
         }
 
         public IEnumerable<Inline> Inlines { get; private set; }
-
-        public override string ToString()
-        {
-            return string.Join("", Inlines.Select(c => c.ToString()));
-        }
     }
 }

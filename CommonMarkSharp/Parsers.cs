@@ -15,38 +15,28 @@ namespace CommonMarkSharp
         {
             LineBreakParser = new LineBreakParser();
             BacktickParser = new BacktickParser();
-
             InlineCodeParser = new InlineCodeParser();
             EscapedCharParser = new EscapedCharParser();
             EntityParser = new EntityParser();
-
             StrWithEntitiesParser = new StrWithEntitiesParser(this);
             EscapedStringParser = new EscapedStringParser(this);
             AutolinkParser = new AutolinkParser(this);
             AutolinkEmailParser = new AutolinkEmailParser(this);
-
             RawHtmlParser = new RawHtmlParser();
-
             LinkLabelParser = new LinkLabelParser(this);
-
             LinkDestinationParser = new LinkDestinationParser(this);
             LinkTitleParser = new LinkTitleParser(this);
-
             LinkReferenceParser = new LinkReferenceParser(this);
             LinkParser = new LinkParser(this);
-
             ImageParser = new ImageParser(this);
             ImageReferenceParser = new ImageReferenceParser(this);
-
             LinkDefinitionParser = new LinkDefinitionParser(this);
-
             EmphasisParser = new EmphasisParser(this);
-
             InlineParser = new InlineParser(this);
-
             CommonMarkInlineParser = new CommonMarkInlineParser(this);
         }
 
+        // Inline parsers
         public IParser<LineBreak> LineBreakParser { get; set; }
         public IParser<InlineString> BacktickParser { get; set; }
         public IParser<InlineCode> InlineCodeParser { get; set; }

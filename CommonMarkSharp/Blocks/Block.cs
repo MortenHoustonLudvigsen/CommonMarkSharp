@@ -48,20 +48,6 @@ namespace CommonMarkSharp.Blocks
             return block;
         }
 
-        //public bool HasParent<TBlock>()
-        //    where TBlock : Block
-        //{
-        //    if (Parent == null)
-        //    {
-        //        return false;
-        //    }
-        //    if (Parent is TBlock)
-        //    {
-        //        return true;
-        //    }
-        //    return Parent.HasParent<TBlock>();
-        //}
-
         private readonly List<Block> _children = new List<Block>();
         public IEnumerable<Block> Children { get { return _children; } }
 

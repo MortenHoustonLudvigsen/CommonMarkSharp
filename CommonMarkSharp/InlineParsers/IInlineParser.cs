@@ -1,11 +1,4 @@
-﻿using CommonMarkSharp.Blocks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommonMarkSharp.InlineParsers
+﻿namespace CommonMarkSharp.InlineParsers
 {
     public interface IInlineParser<out T>
         where T: class

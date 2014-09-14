@@ -1,11 +1,4 @@
-﻿using CommonMarkSharp.Blocks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommonMarkSharp.BlockParsers
+﻿namespace CommonMarkSharp.BlockParsers
 {
     public static class IBlockParserExtensions
     {

@@ -1,10 +1,7 @@
-﻿using CommonMarkSharp.Blocks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommonMarkSharp
 {
@@ -26,10 +23,25 @@ namespace CommonMarkSharp
             _visitors[typeof(TPart)] = new Visitor(visitor.Target, visitor.Method);
         }
 
-        private void VisitPart(Part part, Type partType)
+        private Visitor FindVisitor(Type partType)
         {
-            Visitor visitor;
-            if (_visitors.TryGetValue(partType, out visitor))
+            Visitor visitor = null;
+            if (!_visitors.TryGetValue(partType, out visitor))
+            {
+                if (partType != typeof(Part) && partType != typeof(object))
+                {
+                    visitor = FindVisitor(partType.BaseType);
+                    _visitors.Add(partType, visitor);
+                }
+            }
+            return visitor;
+        }
+
+        public virtual void VisitPart(Part part)
+        {
+            if (part == null) throw new ArgumentNullException("part");
+            var visitor = FindVisitor(part.GetType());
+            if (visitor != null)
             {
                 _currents.Push(part);
                 try
@@ -41,16 +53,6 @@ namespace CommonMarkSharp
                     _currents.Pop();
                 }
             }
-            else if (partType != typeof(Part) && partType != typeof(object))
-            {
-                VisitPart(part, partType.BaseType);
-            }
-        }
-
-        public virtual void VisitPart(Part part)
-        {
-            if (part == null) throw new ArgumentNullException("part");
-            VisitPart(part, part.GetType());
         }
 
         private class VisitorInfo

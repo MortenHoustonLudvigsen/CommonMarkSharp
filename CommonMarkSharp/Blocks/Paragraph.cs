@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommonMarkSharp.InlineParsers;
-using System.Text.RegularExpressions;
-using CommonMarkSharp.Inlines;
+﻿using System.Text.RegularExpressions;
 
 namespace CommonMarkSharp.Blocks
 {
@@ -21,8 +14,8 @@ namespace CommonMarkSharp.Blocks
         public override void Close(ParserContext context)
         {
             base.Close(context);
-            Contents = LeadingSpaceRe.Replace(string.Join("\n", Strings), "");
-            var subject = new Subject(Contents);
+            var subject = new Subject(string.Join("\n", Strings));
+            subject.SkipWhiteSpace();
             var hasLinkDefinition = false;
             var linkDefinition = context.Parsers.LinkDefinitionParser.Parse(context, subject);
             while (linkDefinition != null)
@@ -31,14 +24,12 @@ namespace CommonMarkSharp.Blocks
                 Document.AddLinkDefinition(new LinkDefinition(linkDefinition));
                 linkDefinition = context.Parsers.LinkDefinitionParser.Parse(context, subject);
             }
-            if (hasLinkDefinition)
+            subject.SkipWhiteSpace();
+            if (hasLinkDefinition && subject.EndOfString)
             {
-                Contents = subject.Rest;
-                if (string.IsNullOrWhiteSpace(Contents))
-                {
-                    Parent.Remove(this);
-                }
+                Parent.Remove(this);
             }
+            Contents = subject.Rest;
         }
 
         public override bool MatchNextLine(Subject subject)

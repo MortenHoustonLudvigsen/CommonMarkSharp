@@ -1,12 +1,7 @@
-﻿using CommonMarkSharp.Inlines;
-using CommonMarkSharp.InlineParsers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommonMarkSharp.BlockParsers;
 using CommonMarkSharp.Blocks;
-using CommonMarkSharp.BlockParsers;
+using CommonMarkSharp.InlineParsers;
+using CommonMarkSharp.Inlines;
 
 namespace CommonMarkSharp
 {

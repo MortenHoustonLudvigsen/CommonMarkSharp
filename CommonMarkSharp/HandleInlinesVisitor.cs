@@ -10,16 +10,16 @@ namespace CommonMarkSharp
 {
     public class HandleInlinesVisitor : CommonMarkVisitor
     {
-        public HandleInlinesVisitor(CommonMarkParser parser)
+        public HandleInlinesVisitor(ParserContext context)
         {
-            Parser = parser;
+            Context = context;
         }
 
-        public CommonMarkParser Parser { get; private set; }
+        public ParserContext Context { get; private set; }
 
         private IEnumerable<Inline> ParseInlines(Block block)
         {
-            return Parser.Parsers.CommonMarkInlineParser.ParseMany(block.Document, block.Contents.Trim());
+            return Context.Parsers.CommonMarkInlineParser.ParseMany(Context, block.Contents.Trim());
         }
 
         public virtual void Visit(Block document)

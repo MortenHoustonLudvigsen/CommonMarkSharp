@@ -11,24 +11,24 @@ namespace CommonMarkSharp.Blocks
     {
         public Document()
         {
-            Tip = this;
+            //Tip = this;
         }
 
         private Dictionary<string, Link> _linkDefinitions = new Dictionary<string, Link>(StringComparer.InvariantCultureIgnoreCase);
 
-        public Block Tip { get; set; }
+        //public Block Tip { get; set; }
 
-        public TBlock AddBlock<TBlock>(CommonMarkParser parser, int lineNumber, TBlock block)
-            where TBlock : Block
-        {
-            while (!Tip.CanContain(block))
-            {
-                Tip.Close(parser, lineNumber);
-            }
-            Tip.Add(block);
-            Tip = block;
-            return block;
-        }
+        //public TBlock AddBlock<TBlock>(CommonMarkParser parser, int lineNumber, TBlock block)
+        //    where TBlock : Block
+        //{
+        //    while (!Tip.CanContain(block))
+        //    {
+        //        Tip.Close(parser, lineNumber);
+        //    }
+        //    Tip.Add(block);
+        //    Tip = block;
+        //    return block;
+        //}
 
         public void AddLinkDefinition(LinkDefinition linkDefinition)
         {

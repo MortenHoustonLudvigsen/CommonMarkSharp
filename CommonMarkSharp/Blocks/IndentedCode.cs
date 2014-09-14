@@ -13,9 +13,9 @@ namespace CommonMarkSharp.Blocks
 
         public override bool AcceptsLines { get { return true; } }
 
-        public override void Close(CommonMarkParser parser, int lineNumber)
+        public override void Close(ParserContext context, int lineNumber)
         {
-            base.Close(parser, lineNumber);
+            base.Close(context, lineNumber);
             Contents = TrailingEmptyLinesRe.Replace(string.Join("\n", Strings), "") + "\n";
         }
 

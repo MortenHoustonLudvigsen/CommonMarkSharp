@@ -70,7 +70,7 @@ namespace CommonMarkSharp.Blocks
             LastChild = block;
         }
 
-        public TBlock Replace<TBlock>(Block originalBlock, TBlock newBlock)
+        public TBlock Replace<TBlock>(ParserContext context, Block originalBlock, TBlock newBlock)
             where TBlock : Block
         {
             var index = _children.IndexOf(originalBlock);
@@ -84,9 +84,9 @@ namespace CommonMarkSharp.Blocks
             }
             LastChild = _children.LastOrDefault();
 
-            if (Document.Tip == originalBlock)
+            if (context.Tip == originalBlock)
             {
-                Document.Tip = newBlock;
+                context.Tip = newBlock;
             }
 
             return newBlock;
@@ -106,7 +106,7 @@ namespace CommonMarkSharp.Blocks
         public bool LastLineIsBlank { get; set; }
         public Block LastChild { get; private set; }
 
-        public virtual void Close(CommonMarkParser parser, int lineNumber)
+        public virtual void Close(ParserContext context, int lineNumber)
         {
             if (!IsOpen)
             {
@@ -114,7 +114,7 @@ namespace CommonMarkSharp.Blocks
             }
             IsOpen = false;
             EndLine = lineNumber;
-            Document.Tip = Document.Tip.Parent;
+            context.Tip = context.Tip.Parent;
         }
 
         public virtual bool MatchNextLine(Subject subject)

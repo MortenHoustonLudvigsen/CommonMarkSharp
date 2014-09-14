@@ -20,18 +20,18 @@ namespace CommonMarkSharp.Blocks
             get { return true; }
         }
 
-        public override void Close(CommonMarkParser parser, int lineNumber)
+        public override void Close(ParserContext context, int lineNumber)
         {
-            base.Close(parser, lineNumber);
+            base.Close(context, lineNumber);
             Contents = LeadingSpaceRe.Replace(string.Join("\n", Strings), "");
             var subject = new Subject(Contents);
             var hasLinkDefinition = false;
-            var linkDefinition = parser.Parsers.LinkDefinitionParser.Parse(this.Document, subject);
+            var linkDefinition = context.Parsers.LinkDefinitionParser.Parse(context, subject);
             while (linkDefinition != null)
             {
                 hasLinkDefinition = true;
                 Document.AddLinkDefinition(new LinkDefinition(linkDefinition));
-                linkDefinition = parser.Parsers.LinkDefinitionParser.Parse(this.Document, subject);
+                linkDefinition = context.Parsers.LinkDefinitionParser.Parse(context, subject);
             }
             if (hasLinkDefinition)
             {

@@ -11,9 +11,12 @@ namespace CommonMarkSharp
     {
         private Dictionary<object, object> _params = new Dictionary<object, object>();
 
-        public ParserContext(Document document)
+        public ParserContext(Parsers parsers, Document document)
         {
+            Parsers = parsers;
             Document = document;
+            Container = document;
+            Tip = document;
         }
 
         private ParserContext(ParserContext context)
@@ -25,7 +28,22 @@ namespace CommonMarkSharp
             }
         }
 
+        public Parsers Parsers { get; private set; }
         public Document Document { get; private set; }
+        public Block Container { get; set; }
+        public Block Tip { get; set; }
+
+        public TBlock AddBlock<TBlock>(int lineNumber, TBlock block)
+            where TBlock : Block
+        {
+            while (!Tip.CanContain(block))
+            {
+                Tip.Close(this, lineNumber);
+            }
+            Tip.Add(block);
+            Tip = block;
+            return block;
+        }
 
         public object this[object param]
         {

@@ -35,9 +35,9 @@ namespace CommonMarkSharp.Blocks
         }
 
 
-        public override void Close(CommonMarkParser parser, int lineNumber)
+        public override void Close(ParserContext context, int lineNumber)
         {
-            base.Close(parser, lineNumber);
+            base.Close(context, lineNumber);
 
             Tight = true; // tight by default
 

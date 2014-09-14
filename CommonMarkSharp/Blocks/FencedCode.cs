@@ -27,15 +27,10 @@ namespace CommonMarkSharp.Blocks
             Contents = Strings.Count() > 1 ? string.Join("\n", Strings.Skip(1)) + "\n" : "";
         }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
             // skip optional spaces of fence offset
-            var i = Offset;
-            while (i > 0 && lineInfo[lineInfo.Offset] == ' ')
-            {
-                lineInfo.Offset++;
-                i--;
-            }
+            subject.AdvanceWhile(c => c == ' ', Offset);
             return true;
         }
     }

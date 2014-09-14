@@ -19,15 +19,15 @@ namespace CommonMarkSharp.Blocks
             Contents = TrailingEmptyLinesRe.Replace(string.Join("\n", Strings), "") + "\n";
         }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
-            if (lineInfo.Indent >= CommonMarkParser.CODE_INDENT)
+            if (subject.Indent >= CommonMarkParser.CODE_INDENT)
             {
-                lineInfo.Offset += CommonMarkParser.CODE_INDENT;
+                subject.Advance(CommonMarkParser.CODE_INDENT);
             }
-            else if (lineInfo.Blank)
+            else if (subject.IsBlank)
             {
-                lineInfo.Offset = lineInfo.FirstNonSpace;
+                subject.AdvanceToFirstNonSpace();
             }
             else
             {

@@ -19,7 +19,7 @@ namespace CommonMarkSharp.Blocks
         public IEnumerable<Inline> Inlines { get; set; }
         public override bool AcceptsLines { get { return true; } }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
             return false;
         }

@@ -13,15 +13,16 @@ namespace CommonMarkSharp.Blocks
             return true;
         }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
-            var matched = lineInfo.Indent <= 3 && lineInfo[lineInfo.FirstNonSpace] == '>';
+            var matched = subject.Indent <= 3 && subject.FirstNonSpaceChar == '>';
             if (matched)
             {
-                lineInfo.Offset = lineInfo.FirstNonSpace + 1;
-                if (lineInfo[lineInfo.Offset] == ' ')
+                subject.AdvanceToFirstNonSpace();
+                subject.Advance();
+                if (subject.Char == ' ')
                 {
-                    lineInfo.Offset++;
+                    subject.Advance();
                 }
             }
             return matched;

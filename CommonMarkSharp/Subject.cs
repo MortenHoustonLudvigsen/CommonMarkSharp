@@ -20,8 +20,10 @@ namespace CommonMarkSharp
             get { return _index; }
             private set
             {
-                if (value < 0) throw new ArgumentException("Index must not be less than 0");
-                if (value > Text.Length) throw new ArgumentException("Index must not be greater than the text length");
+                if (value < 0)
+                {
+                    throw new ArgumentException("Index must not be less than 0");
+                }
 
                 if (value >= Text.Length)
                 {
@@ -35,10 +37,28 @@ namespace CommonMarkSharp
                     EndOfString = false;
                     Char = Text[_index];
                 }
+                _firstNonSpace = null;
             }
         }
 
         public char Char { get; private set; }
+
+        private int? _firstNonSpace;
+        public int FirstNonSpace
+        {
+            get
+            {
+                if (_firstNonSpace == null)
+                {
+                    _firstNonSpace = Index + CountWhile(c => c == ' ');
+                }
+                return _firstNonSpace.Value;
+            }
+        }
+
+        public char FirstNonSpaceChar { get { return GetChar(FirstNonSpace); } }
+        public bool IsBlank { get { return FirstNonSpace == Text.Length; } }
+        public int Indent { get { return FirstNonSpace - Index; } }
         public bool EndOfString { get; private set; }
         public string Rest { get { return EndOfString ? "" : Text.Substring(Index); } }
 
@@ -72,6 +92,16 @@ namespace CommonMarkSharp
         public int AdvanceWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
             return Advance(CountWhile(predicate, max));
+        }
+
+        public void AdvanceToFirstNonSpace(int offset = 0)
+        {
+            Index = FirstNonSpace + offset;
+        }
+
+        public void AdvanceToEnd(int offset = 0)
+        {
+            Index = Text.Length + offset;
         }
 
         public char Take()

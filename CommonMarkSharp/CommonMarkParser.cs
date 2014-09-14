@@ -49,15 +49,16 @@ namespace CommonMarkSharp
             line = ExpandTabs(line);
 
             var groups = new string[0];
-            var lineInfo = new LineInfo(line);
+            //var subject = new LineInfo(line);
+            var subject = new Subject(line);
             Block container = document;
             ListData listData;
 
             while (container.LastChild != null && container.LastChild.IsOpen)
             {
                 container = container.LastChild;
-                lineInfo.FindFirstNonSpace();
-                if (!container.MatchNextLine(lineInfo))
+                //subject.FindFirstNonSpace();
+                if (!container.MatchNextLine(subject))
                 {
                     container = container.Parent; // back up to last matching block
                     break;
@@ -84,7 +85,7 @@ namespace CommonMarkSharp
             };
 
             // Check to see if we've hit 2nd blank line; if so break out of list:
-            if (lineInfo.Blank && container.LastLineIsBlank)
+            if (subject.IsBlank && container.LastLineIsBlank)
             {
                 BreakOutOfLists(document, container, lineNumber);
             }
@@ -93,14 +94,12 @@ namespace CommonMarkSharp
             // adding children to the last matched container:
             while (!(container is FencedCode || container is IndentedCode || container is HtmlBlock))
             {
-                lineInfo.FindFirstNonSpace();
-
-                if (lineInfo.Indent >= CODE_INDENT)
+                if (subject.Indent >= CODE_INDENT)
                 {
                     // indented code
-                    if (!(document.Tip is Paragraph) && !lineInfo.Blank)
+                    if (!(document.Tip is Paragraph) && !subject.IsBlank)
                     {
-                        lineInfo.Offset += CODE_INDENT;
+                        subject.Advance(CODE_INDENT);
                         closeUnmatchedBlocks();
                         container = document.AddBlock(this, lineNumber, new IndentedCode { StartLine = lineNumber });
                     }
@@ -109,47 +108,47 @@ namespace CommonMarkSharp
                         break;
                     }
                 }
-                else if (lineInfo[lineInfo.FirstNonSpace] == '>')
+                else if (subject.FirstNonSpaceChar == '>')
                 {
                     // blockquote
-                    lineInfo.Offset = lineInfo.FirstNonSpace + 1;
+                    subject.AdvanceToFirstNonSpace(1);
                     // optional following space
-                    if (lineInfo[lineInfo.Offset] == ' ')
+                    if (subject.Char == ' ')
                     {
-                        lineInfo.Offset++;
+                        subject.Advance();
                     }
                     closeUnmatchedBlocks();
                     container = document.AddBlock(this, lineNumber, new BlockQuote { StartLine = lineNumber });
                 }
-                else if (Patterns.ATXHeaderRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
+                else if (Patterns.ATXHeaderRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // ATX header
-                    lineInfo.Offset = lineInfo.FirstNonSpace + groups[0].Length;
+                    subject.AdvanceToFirstNonSpace(groups[0].Length);
                     closeUnmatchedBlocks();
 
                     container = document.AddBlock(this, lineNumber, new ATXHeader(
                         groups[1].Length,
                         // remove trailing ###s:
-                        Patterns.ATXHeaderRemoveTrailingHashRe.Replace(lineInfo.FromOffset, "$1")
+                        Patterns.ATXHeaderRemoveTrailingHashRe.Replace(subject.Rest, "$1")
                     ) { StartLine = lineNumber });
                     break;
                 }
-                else if (Patterns.OpenCodeFenceRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
+                else if (Patterns.OpenCodeFenceRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // fenced code block
-                    var fence_length = groups[0].Length;
+                    var fenceLength = groups[0].Length;
                     closeUnmatchedBlocks();
                     container = document.AddBlock(this, lineNumber, new FencedCode
                     {
                         StartLine = lineNumber,
-                        Length = fence_length,
+                        Length = fenceLength,
                         Char = groups[0][0],
-                        Offset = lineInfo.FirstNonSpace - lineInfo.Offset
+                        Offset = subject.FirstNonSpace - subject.Index
                     });
-                    lineInfo.Offset = lineInfo.FirstNonSpace + fence_length;
+                    subject.AdvanceToFirstNonSpace(fenceLength);
                     break;
                 }
-                else if (Patterns.HtmlBlockTagRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
+                else if (Patterns.HtmlBlockTagRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // html block
                     closeUnmatchedBlocks();
@@ -158,7 +157,7 @@ namespace CommonMarkSharp
                     break;
                 }
                 else if (container is Paragraph && container.Strings.Count() == 1 &&
-                    Patterns.SetExtHeaderRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
+                    Patterns.SetExtHeaderRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // setext header line
                     closeUnmatchedBlocks();
@@ -166,22 +165,22 @@ namespace CommonMarkSharp
                     {
                         StartLine = lineNumber
                     });
-                    lineInfo.Offset = lineInfo.Line.Length;
+                    subject.AdvanceToEnd();
                 }
-                else if (Patterns.HRuleRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups))
+                else if (Patterns.HRuleRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // hrule
                     closeUnmatchedBlocks();
                     container = document.AddBlock(this, lineNumber, new HorizontalRule { StartLine = lineNumber });
-                    lineInfo.Offset = lineInfo.Line.Length - 1;
+                    subject.AdvanceToEnd(-1);
                     break;
                 }
-                else if ((listData = ParseListMarker(lineInfo)) != null)
+                else if ((listData = ParseListMarker(subject)) != null)
                 {
                     // list item
                     closeUnmatchedBlocks();
-                    listData.MarkerOffset = lineInfo.Indent;
-                    lineInfo.Offset = lineInfo.FirstNonSpace + listData.Padding;
+                    listData.MarkerOffset = subject.Indent;
+                    subject.AdvanceToFirstNonSpace(listData.Padding);
 
                     var list = container as List;
                     // add the list if needed
@@ -208,14 +207,13 @@ namespace CommonMarkSharp
             // What remains at the offset is a text line.  Add the text to the
             // appropriate container.
 
-            lineInfo.FindFirstNonSpace();
             // First check for a lazy paragraph continuation:
-            if (document.Tip != lastMatchedContainer && !lineInfo.Blank &&
+            if (document.Tip != lastMatchedContainer && !subject.IsBlank &&
                 document.Tip is Paragraph && document.Tip.Strings.Any())
             {
                 // lazy paragraph continuation
                 //document.Tip.LastLineIsBlank = false;
-                document.Tip.AddLine(lineInfo.FromOffset);
+                document.Tip.AddLine(subject.Rest);
             }
             else
             {
@@ -228,25 +226,18 @@ namespace CommonMarkSharp
                 // and we don't count blanks in fenced code for purposes of tight/loose
                 // lists or breaking out of lists.  We also don't set last_line_blank
                 // on an empty list item.
-                if (!lineInfo.Blank || container is BlockQuote || container is FencedCode)
+                if (!subject.IsBlank || container is BlockQuote || container is FencedCode)
                 {
                     container.LastLineIsBlank = false;
                 }
                 else if (container is ListItem)
                 {
-                    container.LastLineIsBlank = container.Children.Any() && container.StartLine < lineNumber;
+                    container.LastLineIsBlank = container.StartLine < lineNumber;
                 }
                 else
                 {
                     container.LastLineIsBlank = true;
                 }
-                //container.LastLineIsBlank = lineInfo.Blank &&
-                //  !(container is BlockQuote ||
-                //    container is FencedCode || (
-                //        container is ListItem &&
-                //        !container.Children.Any() && container.StartLine == lineNumber
-                //    )
-                //  );
 
                 var cont = container;
                 while (cont.Parent is Block)
@@ -257,16 +248,16 @@ namespace CommonMarkSharp
 
                 if (container is IndentedCode || container is HtmlBlock)
                 {
-                    document.Tip.AddLine(lineInfo.FromOffset);
+                    document.Tip.AddLine(subject.Rest);
                 }
                 else if (container is FencedCode)
                 {
                     var fencedCode = container as FencedCode;
                     // check for closing code fence:
                     var match =
-                        lineInfo.Indent <= 3 &&
-                        lineInfo[lineInfo.FirstNonSpace] == fencedCode.Char &&
-                        Patterns.CloseCodeFenceRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace, out groups);
+                        subject.Indent <= 3 &&
+                        subject.FirstNonSpaceChar == fencedCode.Char &&
+                        Patterns.CloseCodeFenceRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups);
 
                     if (match && groups[0].Length >= fencedCode.Length)
                     {
@@ -275,7 +266,7 @@ namespace CommonMarkSharp
                     }
                     else
                     {
-                        document.Tip.AddLine(lineInfo.FromOffset);
+                        document.Tip.AddLine(subject.Rest);
                     }
                 }
                 else if (container is ATXHeader || container is SetextHeader || container is HorizontalRule)
@@ -286,9 +277,10 @@ namespace CommonMarkSharp
                 {
                     if (container.AcceptsLines)
                     {
-                        document.Tip.AddLine(lineInfo.FromNonSpace);
+                        subject.AdvanceToFirstNonSpace();
+                        document.Tip.AddLine(subject.Rest);
                     }
-                    else if (lineInfo.Blank)
+                    else if (subject.IsBlank)
                     {
                         // do nothing
                     }
@@ -296,12 +288,13 @@ namespace CommonMarkSharp
                     {
                         // create paragraph container for line
                         container = document.AddBlock(this, lineNumber, new Paragraph { StartLine = lineNumber });
-                        document.Tip.AddLine(lineInfo.FromNonSpace);
+                        subject.AdvanceToFirstNonSpace();
+                        document.Tip.AddLine(subject.Rest);
                     }
                     else
                     {
                         throw new Exception(
-                            "Line " + // line_number.toString() +
+                            "Line " + lineNumber.ToString() +
                             " with container type " + container.GetType().Name +
                             " did not match any condition."
                         );
@@ -312,42 +305,47 @@ namespace CommonMarkSharp
 
         private static Regex _bulletListMarkerRe = RegexUtils.Create(@"^[*+-]( +|$)");
         private static Regex _orderedListMarkerRe = RegexUtils.Create(@"^(\d+)([.)])( +|$)");
-        private ListData ParseListMarker(LineInfo lineInfo)
+        private ListData ParseListMarker(Subject subject)
         {
-            var rest = lineInfo.FromNonSpace;
+            var savedSubject = subject.Save();
+            subject.AdvanceToFirstNonSpace();
+            var rest = subject.Rest;
             var groups = new string[0];
-            var spaces_after_marker = 0;
+            var spacesAfterMarker = 0;
             var data = new ListData();
-            if (rest == "" || lineInfo.FirstNonSpace < lineInfo.Line.Length && Patterns.HRuleRe.IsMatch(lineInfo.Line, lineInfo.FirstNonSpace))
+            if (rest == "" || !subject.EndOfString && Patterns.HRuleRe.IsMatch(subject.Text, subject.FirstNonSpace))
             {
+                savedSubject.Restore();
                 return null;
             }
             if (_bulletListMarkerRe.IsMatch(rest, out groups))
             {
-                spaces_after_marker = groups[1].Length;
+                spacesAfterMarker = groups[1].Length;
                 data.Type = "Bullet";
                 data.BulletChar = groups[0][0];
             }
             else if (_orderedListMarkerRe.IsMatch(rest, out groups))
             {
-                spaces_after_marker = groups[3].Length;
+                spacesAfterMarker = groups[3].Length;
                 data.Type = "Ordered";
                 data.Start = int.Parse(groups[1]);
                 data.Delimiter = groups[2];
             }
             else
             {
+                savedSubject.Restore();
                 return null;
             }
-            var blank_item = groups[0].Length == rest.Length;
-            if (spaces_after_marker >= 5 || spaces_after_marker < 1 || blank_item)
+            var itemIsBlank = groups[0].Length == rest.Length;
+            if (spacesAfterMarker >= 5 || spacesAfterMarker < 1 || itemIsBlank)
             {
-                data.Padding = groups[0].Length - spaces_after_marker + 1;
+                data.Padding = groups[0].Length - spacesAfterMarker + 1;
             }
             else
             {
                 data.Padding = groups[0].Length;
             }
+            savedSubject.Restore();
             return data;
         }
 
@@ -379,20 +377,37 @@ namespace CommonMarkSharp
             }
         }
 
-        private static Regex _expandTabsRe = RegexUtils.Create("\t");
-        private string ExpandTabs(string line)
+        private string ExpandTabs(string line, int tabWidth = 4)
         {
-            if (!line.Contains('\t'))
+            var result = (StringBuilder)null;
+            var pos = 0;
+            var start = 0;
+            for (var i = 0; i < line.Length; i++)
             {
-                return line;
+                var c = line[i];
+                if (c == '\t')
+                {
+                    if (result == null)
+                    {
+                        result = new StringBuilder(line.Length + 30);
+                    }
+                    result.Append(line, start, i - start);
+                    var count = tabWidth - pos % tabWidth;
+                    pos += count;
+                    start = i + 1;
+                    result.Append(new string(' ', count));
+                }
+                else
+                {
+                    pos += 1;
+                }
             }
-            var lastStop = 0;
-            return _expandTabsRe.Replace(line, m =>
+            if (result != null)
             {
-                var result = new string(' ', 4 - (m.Index - lastStop) % 4);
-                lastStop = m.Index + 1;
-                return result;
-            });
+                result.Append(line, start, line.Length - start);
+                return result.ToString();
+            }
+            return line;
         }
     }
 }

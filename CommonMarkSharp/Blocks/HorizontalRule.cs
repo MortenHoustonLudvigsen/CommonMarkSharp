@@ -8,7 +8,7 @@ namespace CommonMarkSharp.Blocks
 {
     public class HorizontalRule : LeafBlock
     {
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
             return false;
         }

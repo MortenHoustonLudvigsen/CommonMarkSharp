@@ -33,15 +33,15 @@ namespace CommonMarkSharp.Blocks
             }
         }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
-            if (lineInfo.Indent >= Data.MarkerOffset + Data.Padding)
+            if (subject.Indent >= Data.MarkerOffset + Data.Padding)
             {
-                lineInfo.Offset += Data.MarkerOffset + Data.Padding;
+                subject.Advance(Data.MarkerOffset + Data.Padding);
             }
-            else if (lineInfo.Blank)
+            else if (subject.IsBlank)
             {
-                lineInfo.Offset = lineInfo.FirstNonSpace;
+                subject.AdvanceToFirstNonSpace();
             }
             else
             {

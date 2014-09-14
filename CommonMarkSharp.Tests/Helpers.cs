@@ -55,12 +55,27 @@ namespace CommonMarkSharp.Tests
             return string.Join("\n", result);
         }
 
-        public static void Log(string caption, string text)
+        public static void Log()
         {
-            Console.WriteLine("{0}:", caption);
             Console.WriteLine();
-            Console.WriteLine(string.Join("\n", text.Replace("\r", "").Split('\n', '\r').Select(s => "    " + s)));
-            Console.WriteLine();
+        }
+
+        public static void Log(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        public static void Log(string format, params object[] args)
+        {
+            Log(string.Format(format, args));
+        }
+
+        public static void LogValue(string caption, string text)
+        {
+            Log("{0}:", caption);
+            Log();
+            Log(string.Join("\n", text.Replace("\r", "").Split('\n', '\r').Select(s => "    " + s)));
+            Log();
         }
     }
 }

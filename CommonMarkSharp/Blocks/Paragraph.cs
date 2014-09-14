@@ -43,9 +43,9 @@ namespace CommonMarkSharp.Blocks
             }
         }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
-            if (lineInfo.Blank)
+            if (subject.IsBlank)
             {
                 LastLineIsBlank = true;
                 return false;

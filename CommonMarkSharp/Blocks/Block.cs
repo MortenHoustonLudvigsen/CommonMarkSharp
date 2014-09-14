@@ -117,7 +117,7 @@ namespace CommonMarkSharp.Blocks
             Document.Tip = Document.Tip.Parent;
         }
 
-        public virtual bool MatchNextLine(LineInfo lineInfo)
+        public virtual bool MatchNextLine(Subject subject)
         {
             return true;
         }

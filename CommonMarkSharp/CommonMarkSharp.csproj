@@ -35,6 +35,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockParsers\IndentedCodeParser.cs" />
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
     <Compile Include="InlineParsers\AllParser.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Inlines\LinkTitle.cs" />
     <Compile Include="Inlines\SoftBreak.cs" />
     <Compile Include="Inlines\StrongEmphasis.cs" />
-    <Compile Include="LineInfo.cs" />
     <Compile Include="Parsers.cs" />
     <Compile Include="IParser.cs" />
     <Compile Include="InlineParsers\LineBreakParser.cs" />

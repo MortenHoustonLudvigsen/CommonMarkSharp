@@ -73,14 +73,17 @@ foreach (var item in ReadSpecs(specFile))
             // Arrange
             var commonMark = Helpers.Normalize("<#= Escape(spec.CommonMark) #>");
             var expected = Helpers.Normalize("<#= Escape(spec.Html) #>");
-            Helpers.Log("CommonMark", "<#= Escape(spec.CommonMark) #>");
-            Helpers.Log("Expected", expected);
+            Helpers.Log("Section: {0}", "<#= Escape(spec.SecHeading) #>");
+            Helpers.Log("Example: {0}", <#= spec.Example #>);
+            Helpers.Log();
+            Helpers.LogValue("CommonMark", "<#= Escape(spec.CommonMark) #>");
+            Helpers.LogValue("Expected", expected);
 
             // Act
             var actual = _cm.RenderAsHtml(commonMark);
 
             // Assert
-            Helpers.Log("Actual", actual);
+            Helpers.LogValue("Actual", actual);
             Assert.AreEqual(Helpers.Tidy(expected), Helpers.Tidy(actual));
         }
 

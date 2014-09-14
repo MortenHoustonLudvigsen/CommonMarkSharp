@@ -16,9 +16,9 @@ namespace CommonMarkSharp.Blocks
             Contents = string.Join("\n", Strings);
         }
 
-        public override bool MatchNextLine(LineInfo lineInfo)
+        public override bool MatchNextLine(Subject subject)
         {
-            return !lineInfo.Blank;
+            return !subject.IsBlank;
         }
     }
 }

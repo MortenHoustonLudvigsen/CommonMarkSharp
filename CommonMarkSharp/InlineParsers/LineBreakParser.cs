@@ -22,7 +22,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
 
             LineBreak result = null;
 
@@ -51,7 +51,7 @@ namespace CommonMarkSharp.InlineParsers
                 return result;
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

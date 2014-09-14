@@ -85,7 +85,7 @@ namespace CommonMarkSharp
         //     [<] blocktagname (spacechar | [/>])
         //     [<] [!?]
         public static readonly string HtmlBlockTagClose = string.Format(@"</{0}(?:{1}|>)", BlockTagName, SpaceChar);
-        public static readonly string HtmlBlockTagOpen = string.Format(@"<{0}(?:{1}|>)", BlockTagName, SpaceChar);
+        public static readonly string HtmlBlockTagOpen = string.Format(@"<{0}(?:{1}|/>)", BlockTagName, SpaceChar);
         public static readonly string HtmlBlockTag1 = @"<[!?]";
         public static readonly string HtmlBlockTag = RegexUtils.Join(HtmlBlockTagClose, HtmlBlockTagOpen, HtmlBlockTag1);
         public static readonly Regex HtmlBlockTagRe = new Regex(string.Format(@"\G{0}", HtmlBlockTag), RegexUtils.IgnoreCase);

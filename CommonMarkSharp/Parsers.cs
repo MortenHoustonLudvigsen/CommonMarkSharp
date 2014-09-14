@@ -39,6 +39,11 @@ namespace CommonMarkSharp
 
             // Create block parsers
             IndentedCodeParser = new IndentedCodeParser();
+            LazyParagraphContinuationParser = new LazyParagraphContinuationParser();
+            BlockQuoteParser = new BlockQuoteParser();
+            ATXHeaderParser = new ATXHeaderParser();
+            FencedCodeParser = new FencedCodeParser();
+            HtmlBlockParser = new HtmlBlockParser();
         }
 
         // Inline parsers
@@ -66,5 +71,10 @@ namespace CommonMarkSharp
 
         // Block parsers
         public IBlockParser<IndentedCode> IndentedCodeParser { get; set; }
+        public IBlockParser<Block> LazyParagraphContinuationParser { get; set; }
+        public IBlockParser<BlockQuote> BlockQuoteParser { get; set; }
+        public IBlockParser<ATXHeader> ATXHeaderParser { get; set; }
+        public IBlockParser<FencedCode> FencedCodeParser { get; set; }
+        public IBlockParser<HtmlBlock> HtmlBlockParser { get; set; }
     }
 }

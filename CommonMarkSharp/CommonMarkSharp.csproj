@@ -35,9 +35,14 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockParsers\ATXHeaderParser.cs" />
+    <Compile Include="BlockParsers\BlockQuoteParser.cs" />
+    <Compile Include="BlockParsers\FencedCodeParser.cs" />
+    <Compile Include="BlockParsers\HtmlBlockParser.cs" />
     <Compile Include="BlockParsers\IBlockParser.cs" />
     <Compile Include="BlockParsers\IBlockParserExtensions.cs" />
     <Compile Include="BlockParsers\IndentedCodeParser.cs" />
+    <Compile Include="BlockParsers\LazyParagraphContinuationParser.cs" />
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
     <Compile Include="InlineParsers\AllParser.cs" />
@@ -58,7 +63,7 @@
     <Compile Include="Blocks\ListData.cs" />
     <Compile Include="Blocks\ListItem.cs" />
     <Compile Include="Blocks\Paragraph.cs" />
-    <Compile Include="Blocks\SetextHeader.cs" />
+    <Compile Include="Blocks\SetExtHeader.cs" />
     <Compile Include="CommonMarkVisitor.cs" />
     <Compile Include="HandleInlinesVisitor.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
@@ -67,7 +72,7 @@
     <Compile Include="InlineParsers\AutolinkParser.cs" />
     <Compile Include="InlineParsers\BacktickParser.cs" />
     <Compile Include="InlineParsers\CommonMarkInlineParser.cs" />
-    <Compile Include="CompositeParser.cs" />
+    <Compile Include="InlineParsers\CompositeInlineParser.cs" />
     <Compile Include="InlineParsers\EmphasisParser.cs" />
     <Compile Include="InlineParsers\EntityParser.cs" />
     <Compile Include="InlineParsers\ImageParser.cs" />

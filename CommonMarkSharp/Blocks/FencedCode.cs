@@ -13,6 +13,7 @@ namespace CommonMarkSharp.Blocks
     {
         private static Regex _spaceRe = new Regex(" +", RegexOptions.Compiled);
 
+        public override bool IsCode { get { return true; } }
         public string Info { get; private set; }
         public int Length { get; set; }
         public char Char { get; set; }
@@ -21,9 +22,9 @@ namespace CommonMarkSharp.Blocks
 
         public override bool AcceptsLines { get { return true; } }
 
-        public override void Close(ParserContext context, int lineNumber)
+        public override void Close(ParserContext context)
         {
-            base.Close(context, lineNumber);
+            base.Close(context);
             Info = string.Join("", context.Parsers.EscapedStringParser.ParseMany(context, Strings.First()).Cast<InlineString>().Select(s => s.Value)).Trim();
             Contents = Strings.Count() > 1 ? string.Join("\n", Strings.Skip(1)) + "\n" : "";
         }

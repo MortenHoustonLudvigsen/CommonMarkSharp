@@ -22,7 +22,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             var openticks = subject.TakeWhile(c => c == '`').ToArray();
             var code = "";
             var codeEnded = false;
@@ -50,7 +50,7 @@ namespace CommonMarkSharp.InlineParsers
                 return new InlineCode(RegexUtils.NormalizeWhitespace(code));
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

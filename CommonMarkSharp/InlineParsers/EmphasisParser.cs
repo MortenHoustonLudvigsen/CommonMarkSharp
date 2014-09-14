@@ -29,7 +29,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             var emphChar = subject.Char;
             int startCount;
             int endCount;
@@ -84,7 +84,7 @@ namespace CommonMarkSharp.InlineParsers
                         var inline = Parsers.CommonMarkInlineParser.Parse(context, subject);
                         if (inline == null)
                         {
-                            savedSubject.Restore();
+                            saved.Restore();
                             return null;
                         }
                         inlines.Add(inline);
@@ -92,7 +92,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return new InlineString(subject.TakeWhile(c => c == emphChar));
         }
 

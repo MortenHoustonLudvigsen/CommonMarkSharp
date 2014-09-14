@@ -9,26 +9,25 @@ namespace CommonMarkSharp.BlockParsers
 {
     public static class IBlockParserExtensions
     {
-        public static IEnumerable<T> ParseMany<T>(this IBlockParser<T> parser, ParserContext context, string input)
+        public static int ParseMany<T>(this IBlockParser<T> parser, ParserContext context, string input)
             where T : class
         {
             return parser.ParseMany(context, new Subject(input));
         }
 
-        public static IEnumerable<T> ParseMany<T>(this IBlockParser<T> parser, ParserContext context, Subject subject)
+        public static int ParseMany<T>(this IBlockParser<T> parser, ParserContext context, Subject subject)
             where T : class
         {
-            var parts = new List<T>();
+            var count = 0;
             while (!subject.EndOfString)
             {
-                var part = parser.Parse(context, subject);
-                if (part == null)
+                if (!parser.Parse(context, subject))
                 {
-                    break;
+                    return count;
                 }
-                parts.Add(part);
+                count += 1;
             }
-            return parts;
+            return count;
         }
     }
 }

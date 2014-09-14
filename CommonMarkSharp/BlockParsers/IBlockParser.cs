@@ -12,6 +12,6 @@ namespace CommonMarkSharp.BlockParsers
     {
         string StartsWithChars { get; }
         bool CanParse(Subject subject);
-        T Parse(ParserContext context, Subject subject);
+        bool Parse(ParserContext context, Subject subject);
     }
 }

@@ -28,7 +28,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
 
             var matched = MatchOpenTag(subject);
             matched = matched || MatchCloseTag(subject);
@@ -39,10 +39,10 @@ namespace CommonMarkSharp.InlineParsers
 
             if (matched)
             {
-                return new RawHtml(savedSubject.GetLiteral());
+                return new RawHtml(saved.GetLiteral());
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
 
@@ -53,7 +53,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             if (MatchTagName(subject))
             {
@@ -71,7 +71,7 @@ namespace CommonMarkSharp.InlineParsers
                     return true;
                 }
             }
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -82,7 +82,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance(2);
             if (MatchTagName(subject))
             {
@@ -93,7 +93,7 @@ namespace CommonMarkSharp.InlineParsers
                     return true;
                 }
             }
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -104,7 +104,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance(4);
 
             var finished = false;
@@ -126,7 +126,7 @@ namespace CommonMarkSharp.InlineParsers
                 return true;
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -137,7 +137,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance(2);
 
             var finished = false;
@@ -159,7 +159,7 @@ namespace CommonMarkSharp.InlineParsers
                 return true;
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -171,7 +171,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance(2);
 
             if (subject.AdvanceWhile(c => _declarationChars.Contains(c)) > 0)
@@ -186,7 +186,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -197,7 +197,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance(8);
 
             var finished = false;
@@ -224,7 +224,7 @@ namespace CommonMarkSharp.InlineParsers
                 return true;
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -236,7 +236,7 @@ namespace CommonMarkSharp.InlineParsers
                 return false;
             }
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             if (MatchAttributeName(subject))
             {
@@ -244,18 +244,18 @@ namespace CommonMarkSharp.InlineParsers
                 return true;
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
         // attributevaluespec = spacechar* [=] spacechar* attributevalue;
         private bool MatchAttributeValueSpec(Subject subject)
         {
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.SkipWhiteSpace();
             if (subject.Char != '=')
             {
-                savedSubject.Restore();
+                saved.Restore();
                 return false;
             }
             subject.Advance();
@@ -266,7 +266,7 @@ namespace CommonMarkSharp.InlineParsers
                 return true;
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -294,7 +294,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             subject.AdvanceWhile(c => c != '\'');
             if (subject.Char == '\'')
@@ -302,7 +302,7 @@ namespace CommonMarkSharp.InlineParsers
                 subject.Advance();
                 return true;
             }
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 
@@ -313,7 +313,7 @@ namespace CommonMarkSharp.InlineParsers
             {
                 return false;
             }
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             subject.AdvanceWhile(c => c != '"');
             if (subject.Char == '"')
@@ -321,7 +321,7 @@ namespace CommonMarkSharp.InlineParsers
                 subject.Advance();
                 return true;
             }
-            savedSubject.Restore();
+            saved.Restore();
             return false;
         }
 

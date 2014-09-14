@@ -58,7 +58,7 @@ namespace CommonMarkSharp.InlineParsers
         public AutolinkParser(Parsers parsers)
         {
             Parsers = parsers;
-            _uriParser = new Lazy<IInlineParser<InlineString>>(() => new CompositeParser<InlineString>(
+            _uriParser = new Lazy<IInlineParser<InlineString>>(() => new CompositeInlineParser<InlineString>(
                 parsers.EntityParser,
                 new AllExceptParser(_nonUriChars)
             ));
@@ -81,7 +81,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             var scheme = subject.TakeWhile(c => c != ':');
 
@@ -103,7 +103,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

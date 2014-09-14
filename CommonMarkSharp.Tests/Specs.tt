@@ -64,17 +64,20 @@ foreach (var item in ReadSpecs(specFile))
         //[Timeout(1000)]
         public void <#= spec.Name #>()
         {
-            // Example <#= spec.Example #>:
+            // Example <#= spec.Example #>
+            // Section: <#= spec.SecHeading #>
+            //
             // The following CommonMark:
 <#= string.Join(Environment.NewLine, spec.CommonMark.Split('\n').Select(s => string.Format("            //     {0}", s))) #>
+            //
             // Should be rendered as:
 <#= string.Join(Environment.NewLine, spec.Html.Split('\n').Select(s => string.Format("            //     {0}", s))) #>
 
             // Arrange
             var commonMark = Helpers.Normalize("<#= Escape(spec.CommonMark) #>");
             var expected = Helpers.Normalize("<#= Escape(spec.Html) #>");
+            Helpers.Log("Example {0}", <#= spec.Example #>);
             Helpers.Log("Section: {0}", "<#= Escape(spec.SecHeading) #>");
-            Helpers.Log("Example: {0}", <#= spec.Example #>);
             Helpers.Log();
             Helpers.LogValue("CommonMark", "<#= Escape(spec.CommonMark) #>");
             Helpers.LogValue("Expected", expected);

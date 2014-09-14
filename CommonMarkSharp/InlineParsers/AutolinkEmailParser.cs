@@ -41,7 +41,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
 
             var emailStart = subject.Save();
@@ -62,7 +62,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
 

@@ -139,6 +139,26 @@ namespace CommonMarkSharp
             return count;
         }
 
+        public bool Contains(char c, int relativeIndex = 0)
+        {
+            var index = Math.Max(0, Index + relativeIndex);
+            if (index >= Text.Length)
+            {
+                return false;
+            }
+            return Text.IndexOf(c, index) >= 0;
+        }
+
+        public bool Contains(string str, int relativeIndex = 0)
+        {
+            var index = Math.Max(0, Index + relativeIndex);
+            if (index >= Text.Length)
+            {
+                return false;
+            }
+            return Text.IndexOf(str, index) >= 0;
+        }
+
         public bool StartsWith(string str, int relativeIndex = 0)
         {
             var index = Index + relativeIndex;

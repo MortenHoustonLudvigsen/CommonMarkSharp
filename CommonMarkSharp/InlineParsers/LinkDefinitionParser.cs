@@ -29,7 +29,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
 
             subject.AdvanceWhile(c => c == ' ', 3);
 
@@ -49,7 +49,7 @@ namespace CommonMarkSharp.InlineParsers
 
                 if (destination == null)
                 {
-                    savedSubject.Restore();
+                    saved.Restore();
                     return null;
                 }
                 var advanced = subject.SkipWhiteSpace();
@@ -67,7 +67,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

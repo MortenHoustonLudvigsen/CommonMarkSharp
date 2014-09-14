@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.BlockParsers
 {
-    public class IndentedCodeParser : IBlockParser<IndentedCode>
+    public class LazyParagraphContinuationParser : IBlockParser<Block>
     {
         public string StartsWithChars
         {
@@ -22,22 +22,11 @@ namespace CommonMarkSharp.BlockParsers
         public bool Parse(ParserContext context, Subject subject)
         {
             if (!CanParse(subject)) return false;
-
-            // Do not match if in a paragraph
-            if (context.Tip is Paragraph) return false;
-
-            // Do not match blank line
-            if (subject.IsBlank) return false;
-
             if (subject.Indent >= CommonMarkParser.CODE_INDENT)
             {
-                // indented code
-                subject.Advance(CommonMarkParser.CODE_INDENT);
-                context.CloseUnmatchedBlocks();
-                context.Container = context.AddBlock(new IndentedCode());
+                context.BlocksParsed = true;
                 return true;
             }
-
             return false;
         }
     }

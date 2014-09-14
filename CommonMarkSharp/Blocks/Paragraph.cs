@@ -20,9 +20,9 @@ namespace CommonMarkSharp.Blocks
             get { return true; }
         }
 
-        public override void Close(ParserContext context, int lineNumber)
+        public override void Close(ParserContext context)
         {
-            base.Close(context, lineNumber);
+            base.Close(context);
             Contents = LeadingSpaceRe.Replace(string.Join("\n", Strings), "");
             var subject = new Subject(Contents);
             var hasLinkDefinition = false;

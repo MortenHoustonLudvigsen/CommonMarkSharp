@@ -25,37 +25,30 @@ namespace CommonMarkSharp
         public Document Parse(TextReader reader)
         {
             var context = new ParserContext(Parsers, new Document { StartLine = 1 });
-            string line;
-            var lineNumber = 0;
-            while ((line = reader.ReadLine()) != null)
+            while (context.SetLine(ExpandTabs(reader.ReadLine())))
             {
-                lineNumber += 1;
-                ProcessLine(context, line, lineNumber);
+                ProcessLine(context.CreateChild());
             }
 
             while (context.Tip is Block)
             {
-                context.Tip.Close(context, lineNumber);
+                context.Tip.Close(context);
             }
 
             context.Document.Accept(new HandleInlinesVisitor(context));
             return context.Document;
         }
 
-        private void ProcessLine(ParserContext context, string line, int lineNumber)
+        private void ProcessLine(ParserContext context)
         {
-            line = ExpandTabs(line);
-
             var groups = new string[0];
-            //var subject = new LineInfo(line);
-            var subject = new Subject(line);
+            var subject = new Subject(context.Line);
             ListData listData;
 
             context.Container = context.Document;
             while (context.Container.LastChild != null && context.Container.LastChild.IsOpen)
             {
                 context.Container = context.Container.LastChild;
-                //subject.FindFirstNonSpace();
                 if (!context.Container.MatchNextLine(subject))
                 {
                     context.Container = context.Container.Parent; // back up to last matching block
@@ -71,112 +64,52 @@ namespace CommonMarkSharp
             // want to close unmatched blocks.  So we store this closure for
             // use later, when we have more information.
             var oldtip = context.Tip;
-            Action closeUnmatchedBlocks = () =>
+            context.CloseUnmatchedBlocks = () =>
             {
                 // finalize any blocks not matched
                 while (oldtip != lastMatchedContainer)
                 {
-                    oldtip.Close(context, lineNumber);
+                    oldtip.Close(context);
                     oldtip = oldtip.Parent;
                 }
-                closeUnmatchedBlocks = () => { };
+                context.CloseUnmatchedBlocks = () => { };
             };
 
             // Check to see if we've hit 2nd blank line; if so break out of list:
             if (subject.IsBlank && context.Container.LastLineIsBlank)
             {
-                BreakOutOfLists(context, context.Container, lineNumber);
+                BreakOutOfLists(context, context.Container, context.LineNumber);
             }
 
             // Unless last matched context.Container is a code block, try new context.Container starts,
             // adding children to the last matched context.Container:
-            while (!(context.Container is FencedCode || context.Container is IndentedCode || context.Container is HtmlBlock))
+            while (!context.Container.IsCode && !context.BlocksParsed)
             {
-                if (subject.Indent >= CODE_INDENT)
-                {
-                    // indented code
-                    if (!(context.Tip is Paragraph) && !subject.IsBlank)
-                    {
-                        subject.Advance(CODE_INDENT);
-                        closeUnmatchedBlocks();
-                        context.Container = context.AddBlock(lineNumber, new IndentedCode { StartLine = lineNumber });
-                    }
-                    else
-                    { // indent > 4 in a lazy paragraph continuation
-                        break;
-                    }
-                }
-                else if (subject.FirstNonSpaceChar == '>')
-                {
-                    // blockquote
-                    subject.AdvanceToFirstNonSpace(1);
-                    // optional following space
-                    if (subject.Char == ' ')
-                    {
-                        subject.Advance();
-                    }
-                    closeUnmatchedBlocks();
-                    context.Container = context.AddBlock(lineNumber, new BlockQuote { StartLine = lineNumber });
-                }
-                else if (Patterns.ATXHeaderRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
-                {
-                    // ATX header
-                    subject.AdvanceToFirstNonSpace(groups[0].Length);
-                    closeUnmatchedBlocks();
+                var parsed = context.Parsers.IndentedCodeParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.LazyParagraphContinuationParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.BlockQuoteParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.ATXHeaderParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.FencedCodeParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.HtmlBlockParser.Parse(context, subject);
 
-                    context.Container = context.AddBlock(lineNumber, new ATXHeader(
-                        groups[1].Length,
-                        // remove trailing ###s:
-                        Patterns.ATXHeaderRemoveTrailingHashRe.Replace(subject.Rest, "$1")
-                    ) { StartLine = lineNumber });
-                    break;
-                }
-                else if (Patterns.OpenCodeFenceRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
-                {
-                    // fenced code block
-                    var fenceLength = groups[0].Length;
-                    closeUnmatchedBlocks();
-                    context.Container = context.AddBlock(lineNumber, new FencedCode
-                    {
-                        StartLine = lineNumber,
-                        Length = fenceLength,
-                        Char = groups[0][0],
-                        Offset = subject.FirstNonSpace - subject.Index
-                    });
-                    subject.AdvanceToFirstNonSpace(fenceLength);
-                    break;
-                }
-                else if (Patterns.HtmlBlockTagRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
-                {
-                    // html block
-                    closeUnmatchedBlocks();
-                    context.Container = context.AddBlock(lineNumber, new HtmlBlock { StartLine = lineNumber });
-                    // note, we don't adjust offset because the tag is part of the text
-                    break;
-                }
+                if (parsed) { }
                 else if (context.Container is Paragraph && context.Container.Strings.Count() == 1 &&
                     Patterns.SetExtHeaderRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // setext header line
-                    closeUnmatchedBlocks();
-                    context.Container = context.Container.Parent.Replace(context, context.Container, new SetextHeader(groups[0][0] == '=' ? 1 : 2, context.Container.Strings.First())
-                    {
-                        StartLine = lineNumber
-                    });
+                    context.Container = context.Container.Parent.Replace(context, context.Container, new SetExtHeader(groups[0][0] == '=' ? 1 : 2, context.Container.Strings.First()));
                     subject.AdvanceToEnd();
                 }
                 else if (Patterns.HRuleRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
                 {
                     // hrule
-                    closeUnmatchedBlocks();
-                    context.Container = context.AddBlock(lineNumber, new HorizontalRule { StartLine = lineNumber });
+                    context.AddBlock(new HorizontalRule());
                     subject.AdvanceToEnd(-1);
-                    break;
+                    context.BlocksParsed = true;
                 }
                 else if ((listData = ParseListMarker(subject)) != null)
                 {
                     // list item
-                    closeUnmatchedBlocks();
                     listData.MarkerOffset = subject.Indent;
                     subject.AdvanceToFirstNonSpace(listData.Padding);
 
@@ -184,21 +117,21 @@ namespace CommonMarkSharp
                     // add the list if needed
                     if (list == null || !list.Data.Matches(listData))
                     {
-                        context.Container = context.AddBlock(lineNumber, new List { StartLine = lineNumber, Data = listData });
+                        context.AddBlock(new List { Data = listData });
                     }
 
                     // add the list item
-                    context.Container = context.AddBlock(lineNumber, new ListItem { StartLine = lineNumber, Data = listData });
+                    context.AddBlock(new ListItem { Data = listData });
                 }
                 else
                 {
-                    break;
+                    context.BlocksParsed = true;
                 }
 
                 if (context.Container.AcceptsLines)
                 {
                     // if it's a line context.Container, it can't contain other containers
-                    break;
+                    context.BlocksParsed = true;
                 }
             }
 
@@ -218,7 +151,7 @@ namespace CommonMarkSharp
                 // not a lazy continuation
 
                 // finalize any blocks not matched
-                closeUnmatchedBlocks();
+                context.CloseUnmatchedBlocks();
 
                 // Block quote lines are never blank as they start with >
                 // and we don't count blanks in fenced code for purposes of tight/loose
@@ -230,7 +163,7 @@ namespace CommonMarkSharp
                 }
                 else if (context.Container is ListItem)
                 {
-                    context.Container.LastLineIsBlank = context.Container.StartLine < lineNumber;
+                    context.Container.LastLineIsBlank = context.Container.StartLine < context.LineNumber;
                 }
                 else
                 {
@@ -260,14 +193,14 @@ namespace CommonMarkSharp
                     if (match && groups[0].Length >= fencedCode.Length)
                     {
                         // don't add closing fence to context.Container; instead, close it:
-                        context.Container.Close(context, lineNumber);
+                        context.Container.Close(context);
                     }
                     else
                     {
                         context.Tip.AddLine(subject.Rest);
                     }
                 }
-                else if (context.Container is ATXHeader || context.Container is SetextHeader || context.Container is HorizontalRule)
+                else if (context.Container is ATXHeader || context.Container is SetExtHeader || context.Container is HorizontalRule)
                 {
                     // nothing to do; we already added the contents.
                 }
@@ -282,17 +215,17 @@ namespace CommonMarkSharp
                     {
                         // do nothing
                     }
-                    else if (!(context.Container is HorizontalRule || context.Container is SetextHeader))
+                    else if (!(context.Container is HorizontalRule || context.Container is SetExtHeader))
                     {
                         // create paragraph context.Container for line
-                        context.Container = context.AddBlock(lineNumber, new Paragraph { StartLine = lineNumber });
+                        context.AddBlock(new Paragraph());
                         subject.AdvanceToFirstNonSpace();
                         context.Tip.AddLine(subject.Rest);
                     }
                     else
                     {
                         throw new Exception(
-                            "Line " + lineNumber.ToString() +
+                            "Line " + context.LineNumber.ToString() +
                             " with context.Container type " + context.Container.GetType().Name +
                             " did not match any condition."
                         );
@@ -305,7 +238,7 @@ namespace CommonMarkSharp
         private static Regex _orderedListMarkerRe = RegexUtils.Create(@"^(\d+)([.)])( +|$)");
         private ListData ParseListMarker(Subject subject)
         {
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.AdvanceToFirstNonSpace();
             var rest = subject.Rest;
             var groups = new string[0];
@@ -313,7 +246,7 @@ namespace CommonMarkSharp
             var data = new ListData();
             if (rest == "" || !subject.EndOfString && Patterns.HRuleRe.IsMatch(subject.Text, subject.FirstNonSpace))
             {
-                savedSubject.Restore();
+                saved.Restore();
                 return null;
             }
             if (_bulletListMarkerRe.IsMatch(rest, out groups))
@@ -331,7 +264,7 @@ namespace CommonMarkSharp
             }
             else
             {
-                savedSubject.Restore();
+                saved.Restore();
                 return null;
             }
             var itemIsBlank = groups[0].Length == rest.Length;
@@ -343,7 +276,7 @@ namespace CommonMarkSharp
             {
                 data.Padding = groups[0].Length;
             }
-            savedSubject.Restore();
+            saved.Restore();
             return data;
         }
 
@@ -368,15 +301,19 @@ namespace CommonMarkSharp
             {
                 while (block != lastList)
                 {
-                    block.Close(context, lineNumber);
+                    block.Close(context);
                     block = block.Parent;
                 }
-                lastList.Close(context, lineNumber);
+                lastList.Close(context);
             }
         }
 
         private string ExpandTabs(string line, int tabWidth = 4)
         {
+            if (line == null)
+            {
+                return null;
+            }
             var result = (StringBuilder)null;
             var pos = 0;
             var start = 0;

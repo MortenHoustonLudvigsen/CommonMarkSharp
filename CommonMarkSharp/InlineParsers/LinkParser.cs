@@ -29,7 +29,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
 
             var label = Parsers.LinkLabelParser.Parse(context, subject);
             if (label != null && subject.Char == '(')
@@ -54,7 +54,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

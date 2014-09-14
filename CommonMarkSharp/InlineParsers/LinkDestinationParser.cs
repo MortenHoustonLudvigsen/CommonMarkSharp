@@ -18,19 +18,19 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkDestinationParser(Parsers parsers)
         {
-            _braceContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _braceContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"<>\")
             ));
 
-            _destContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _destContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(Patterns.ControlChars + @"()\&")
             ));
 
-            _destContentParserWithParantheses = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _destContentParserWithParantheses = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new DestParanthesesParser(_destContentParser.Value),
@@ -49,7 +49,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             var inlines = new List<Inline>();
 
             if (subject.Char == '<')
@@ -73,7 +73,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
 
@@ -99,7 +99,7 @@ namespace CommonMarkSharp.InlineParsers
                 {
                     return null;
                 }
-                var savedSubject = subject.Save();
+                var saved = subject.Save();
 
                 var inlines = new List<Inline>();
                 inlines.Add(new InlineString('('));
@@ -113,7 +113,7 @@ namespace CommonMarkSharp.InlineParsers
                     return new InlineList(inlines);
                 }
 
-                savedSubject.Restore();
+                saved.Restore();
                 return null;
             }
         }

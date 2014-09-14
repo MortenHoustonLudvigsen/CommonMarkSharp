@@ -100,20 +100,21 @@ namespace CommonMarkSharp.Blocks
         }
 
         public virtual bool AcceptsLines { get { return false; } }
+        public virtual bool IsCode { get { return false; } }
         public bool IsOpen { get; protected set; }
         public IEnumerable<string> Strings { get { return _strings; } }
         public string Contents { get; set; }
         public bool LastLineIsBlank { get; set; }
         public Block LastChild { get; private set; }
 
-        public virtual void Close(ParserContext context, int lineNumber)
+        public virtual void Close(ParserContext context)
         {
             if (!IsOpen)
             {
                 throw new Exception("This block is already closed");
             }
             IsOpen = false;
-            EndLine = lineNumber;
+            EndLine = context.LineNumber;
             context.Tip = context.Tip.Parent;
         }
 

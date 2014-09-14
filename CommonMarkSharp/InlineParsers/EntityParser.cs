@@ -25,7 +25,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
 
             var found = false;
@@ -51,10 +51,10 @@ namespace CommonMarkSharp.InlineParsers
             if (found && subject.Char == ';')
             {
                 subject.Advance();
-                return new Entity(savedSubject.GetLiteral());
+                return new Entity(saved.GetLiteral());
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

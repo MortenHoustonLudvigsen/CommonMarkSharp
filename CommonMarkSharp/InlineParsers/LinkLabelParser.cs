@@ -14,7 +14,7 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkLabelParser(Parsers parsers)
         {
-            _contentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _contentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.InlineCodeParser,
                 parsers.AutolinkParser,
                 parsers.AutolinkEmailParser,
@@ -39,7 +39,7 @@ namespace CommonMarkSharp.InlineParsers
 
             var embedded = context.HasParam(typeof(LinkLabel));
             var inlines = new List<Inline>();
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             var subjectLiteral = subject.Save();
             if (embedded)
@@ -59,7 +59,7 @@ namespace CommonMarkSharp.InlineParsers
                 return new LinkLabel(literal, inlines);
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
 

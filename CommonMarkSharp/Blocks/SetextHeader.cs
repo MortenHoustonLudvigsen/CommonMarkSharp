@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.Blocks
 {
-    public class SetextHeader : Header
+    public class SetExtHeader : Header
     {
-        public SetextHeader(int level, string contents)
+        public SetExtHeader(int level, string contents)
             : base(level, contents)
         {
         }
 
-        public override void Close(ParserContext context, int lineNumber)
+        public override void Close(ParserContext context)
         {
-            base.Close(context, lineNumber);
+            base.Close(context);
             Contents = string.Join("\n", Strings);
         }
     }

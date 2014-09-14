@@ -28,7 +28,7 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (!CanParse(subject)) return null;
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
 
             var reference = Parsers.LinkReferenceParser.Parse(context, subject);
@@ -37,7 +37,7 @@ namespace CommonMarkSharp.InlineParsers
                 return new ImageReference(reference);
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

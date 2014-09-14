@@ -17,21 +17,21 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkTitleParser(Parsers parsers)
         {
-            _doubleQuoteContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _doubleQuoteContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"""\", 1)
                 //new RegexStringParser(@"\G[^""\\]")
             ));
 
-            _singleQuoteContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _singleQuoteContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"'\", 1)
                 //new RegexStringParser(@"\G[^'\\]")
             ));
 
-            _paranthesesContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeParser<Inline>(
+            _paranthesesContentParser = new Lazy<IInlineParser<Inline>>(() => new CompositeInlineParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@")\", 1)
@@ -73,7 +73,7 @@ namespace CommonMarkSharp.InlineParsers
                 return null;
             }
 
-            var savedSubject = subject.Save();
+            var saved = subject.Save();
             subject.Advance();
             var inlines = contentParser.ParseMany(context, subject);
 
@@ -83,7 +83,7 @@ namespace CommonMarkSharp.InlineParsers
                 return new LinkTitle(inlines);
             }
 
-            savedSubject.Restore();
+            saved.Restore();
             return null;
         }
     }

@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonMarkSharp
+namespace CommonMarkSharp.InlineParsers
 {
-    public class CompositeParser<T> : IInlineParser<T>
+    public class CompositeInlineParser<T> : IInlineParser<T>
         where T: class
     {
-        public CompositeParser(params IInlineParser<T>[] parsers)
+        public CompositeInlineParser(params IInlineParser<T>[] parsers)
         {
             _parsers = parsers.ToList();
             if (_parsers.Any(p => p.StartsWithChars == null))

@@ -12,10 +12,11 @@ namespace CommonMarkSharp.Blocks
         private static readonly Regex TrailingEmptyLinesRe = new Regex(@"(?:\n *)+$", RegexOptions.Compiled);
 
         public override bool AcceptsLines { get { return true; } }
+        public override bool IsCode { get { return true; } }
 
-        public override void Close(ParserContext context, int lineNumber)
+        public override void Close(ParserContext context)
         {
-            base.Close(context, lineNumber);
+            base.Close(context);
             Contents = TrailingEmptyLinesRe.Replace(string.Join("\n", Strings), "") + "\n";
         }
 

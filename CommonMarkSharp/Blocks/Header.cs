@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.Blocks
 {
-    public class Header : LeafBlock
+    public class Header : LeafBlockWithInlines
     {
         public Header(int level, string contents)
         {
@@ -16,7 +16,6 @@ namespace CommonMarkSharp.Blocks
         }
 
         public int Level { get; set; }
-        public IEnumerable<Inline> Inlines { get; set; }
         public override bool AcceptsLines { get { return true; } }
 
         public override bool MatchNextLine(Subject subject)

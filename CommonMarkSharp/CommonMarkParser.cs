@@ -35,8 +35,22 @@ namespace CommonMarkSharp
                 context.Tip.Close(context);
             }
 
-            context.Document.Accept(new HandleInlinesVisitor(context));
+            HandleInlines(context, context.Document);
+            //context.Document.Accept(new HandleInlinesVisitor(context));
             return context.Document;
+        }
+
+        public virtual void HandleInlines(ParserContext context, Block block)
+        {
+            var leafBlockWithInlines = block as LeafBlockWithInlines;
+            if (leafBlockWithInlines != null)
+            {
+                leafBlockWithInlines.Inlines = Parsers.CommonMarkInlineParser.ParseMany(context, block.Contents.Trim());
+            }
+            foreach (var child in block.Children)
+            {
+                HandleInlines(context, child);
+            }
         }
 
         private void ProcessLine(ParserContext context)

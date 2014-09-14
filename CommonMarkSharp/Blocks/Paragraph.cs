@@ -9,11 +9,9 @@ using CommonMarkSharp.Inlines;
 
 namespace CommonMarkSharp.Blocks
 {
-    public class Paragraph : LeafBlock
+    public class Paragraph : LeafBlockWithInlines
     {
         private static readonly Regex LeadingSpaceRe = new Regex(@"^ +", RegexOptions.Compiled);
-
-        public IEnumerable<Inline> Inlines { get; set; }
 
         public override bool AcceptsLines
         {

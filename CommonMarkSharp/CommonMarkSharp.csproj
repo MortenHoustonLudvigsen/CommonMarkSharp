@@ -46,6 +46,7 @@
     <Compile Include="BlockParsers\LazyParagraphContinuationParser.cs" />
     <Compile Include="BlockParsers\ListParser.cs" />
     <Compile Include="BlockParsers\SetExtHeaderParser.cs" />
+    <Compile Include="Blocks\LeafBlockWithInlines.cs" />
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
     <Compile Include="InlineParsers\AllParser.cs" />
@@ -68,7 +69,6 @@
     <Compile Include="Blocks\Paragraph.cs" />
     <Compile Include="Blocks\SetExtHeader.cs" />
     <Compile Include="CommonMarkVisitor.cs" />
-    <Compile Include="HandleInlinesVisitor.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="InlineParsers\EscapedStringParser.cs" />
     <Compile Include="InlineParsers\AutolinkEmailParser.cs" />

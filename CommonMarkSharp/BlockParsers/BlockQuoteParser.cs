@@ -9,20 +9,8 @@ namespace CommonMarkSharp.BlockParsers
 {
     public class BlockQuoteParser: IBlockParser<BlockQuote>
     {
-        public string StartsWithChars
-        {
-            get { return " >"; }
-        }
-
-        public bool CanParse(Subject subject)
-        {
-            return subject.FirstNonSpaceChar == '>';
-        }
-
         public bool Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return false;
-
             if (subject.FirstNonSpaceChar == '>')
             {
                 // blockquote

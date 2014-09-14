@@ -44,6 +44,9 @@ namespace CommonMarkSharp
             ATXHeaderParser = new ATXHeaderParser();
             FencedCodeParser = new FencedCodeParser();
             HtmlBlockParser = new HtmlBlockParser();
+            SetExtHeaderParser = new SetExtHeaderParser();
+            HorizontalRuleParser = new HorizontalRuleParser();
+            ListParser = new ListParser();
         }
 
         // Inline parsers
@@ -76,5 +79,8 @@ namespace CommonMarkSharp
         public IBlockParser<ATXHeader> ATXHeaderParser { get; set; }
         public IBlockParser<FencedCode> FencedCodeParser { get; set; }
         public IBlockParser<HtmlBlock> HtmlBlockParser { get; set; }
+        public IBlockParser<SetExtHeader> SetExtHeaderParser { get; set; }
+        public IBlockParser<HorizontalRule> HorizontalRuleParser { get; set; }
+        public IBlockParser<List> ListParser { get; set; }
     }
 }

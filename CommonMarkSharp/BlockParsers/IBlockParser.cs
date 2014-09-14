@@ -10,8 +10,6 @@ namespace CommonMarkSharp.BlockParsers
     public interface IBlockParser<out T>
         where T: class
     {
-        string StartsWithChars { get; }
-        bool CanParse(Subject subject);
         bool Parse(ParserContext context, Subject subject);
     }
 }

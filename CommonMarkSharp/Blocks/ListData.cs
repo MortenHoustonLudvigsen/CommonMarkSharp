@@ -11,7 +11,7 @@ namespace CommonMarkSharp.Blocks
         public string Type { get; set; }
         public char BulletChar { get; set; }
         public int? Start { get; set; }
-        public string Delimiter { get; set; }
+        public char Delimiter { get; set; }
         public int Padding { get; set; }
         public int MarkerOffset { get; set; }
 

@@ -43,7 +43,6 @@ namespace CommonMarkSharp
         {
             var groups = new string[0];
             var subject = new Subject(context.Line);
-            ListData listData;
 
             context.Container = context.Document;
             while (context.Container.LastChild != null && context.Container.LastChild.IsOpen)
@@ -91,46 +90,13 @@ namespace CommonMarkSharp
                 parsed = parsed || context.Parsers.ATXHeaderParser.Parse(context, subject);
                 parsed = parsed || context.Parsers.FencedCodeParser.Parse(context, subject);
                 parsed = parsed || context.Parsers.HtmlBlockParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.SetExtHeaderParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.HorizontalRuleParser.Parse(context, subject);
+                parsed = parsed || context.Parsers.ListParser.Parse(context, subject);
 
-                if (parsed) { }
-                else if (context.Container is Paragraph && context.Container.Strings.Count() == 1 &&
-                    Patterns.SetExtHeaderRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
+                if (!parsed || context.Container.AcceptsLines)
                 {
-                    // setext header line
-                    context.Container = context.Container.Parent.Replace(context, context.Container, new SetExtHeader(groups[0][0] == '=' ? 1 : 2, context.Container.Strings.First()));
-                    subject.AdvanceToEnd();
-                }
-                else if (Patterns.HRuleRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups))
-                {
-                    // hrule
-                    context.AddBlock(new HorizontalRule());
-                    subject.AdvanceToEnd(-1);
-                    context.BlocksParsed = true;
-                }
-                else if ((listData = ParseListMarker(subject)) != null)
-                {
-                    // list item
-                    listData.MarkerOffset = subject.Indent;
-                    subject.AdvanceToFirstNonSpace(listData.Padding);
-
-                    var list = context.Container as List;
-                    // add the list if needed
-                    if (list == null || !list.Data.Matches(listData))
-                    {
-                        context.AddBlock(new List { Data = listData });
-                    }
-
-                    // add the list item
-                    context.AddBlock(new ListItem { Data = listData });
-                }
-                else
-                {
-                    context.BlocksParsed = true;
-                }
-
-                if (context.Container.AcceptsLines)
-                {
-                    // if it's a line context.Container, it can't contain other containers
+                    // if none were found or it's a line context.Container, it can't contain other containers
                     context.BlocksParsed = true;
                 }
             }
@@ -232,52 +198,6 @@ namespace CommonMarkSharp
                     }
                 }
             }
-        }
-
-        private static Regex _bulletListMarkerRe = RegexUtils.Create(@"^[*+-]( +|$)");
-        private static Regex _orderedListMarkerRe = RegexUtils.Create(@"^(\d+)([.)])( +|$)");
-        private ListData ParseListMarker(Subject subject)
-        {
-            var saved = subject.Save();
-            subject.AdvanceToFirstNonSpace();
-            var rest = subject.Rest;
-            var groups = new string[0];
-            var spacesAfterMarker = 0;
-            var data = new ListData();
-            if (rest == "" || !subject.EndOfString && Patterns.HRuleRe.IsMatch(subject.Text, subject.FirstNonSpace))
-            {
-                saved.Restore();
-                return null;
-            }
-            if (_bulletListMarkerRe.IsMatch(rest, out groups))
-            {
-                spacesAfterMarker = groups[1].Length;
-                data.Type = "Bullet";
-                data.BulletChar = groups[0][0];
-            }
-            else if (_orderedListMarkerRe.IsMatch(rest, out groups))
-            {
-                spacesAfterMarker = groups[3].Length;
-                data.Type = "Ordered";
-                data.Start = int.Parse(groups[1]);
-                data.Delimiter = groups[2];
-            }
-            else
-            {
-                saved.Restore();
-                return null;
-            }
-            var itemIsBlank = groups[0].Length == rest.Length;
-            if (spacesAfterMarker >= 5 || spacesAfterMarker < 1 || itemIsBlank)
-            {
-                data.Padding = groups[0].Length - spacesAfterMarker + 1;
-            }
-            else
-            {
-                data.Padding = groups[0].Length;
-            }
-            saved.Restore();
-            return data;
         }
 
         // Break out of all containing lists, resetting the tip of the

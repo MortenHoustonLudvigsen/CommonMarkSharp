@@ -25,20 +25,8 @@ namespace CommonMarkSharp.BlockParsers
             _tagNames.SelectMany(t => t).Distinct().Concat(_tagNames.SelectMany(t => t.ToUpper()).Distinct())
         );
 
-        public string StartsWithChars
-        {
-            get { return " <"; }
-        }
-
-        public bool CanParse(Subject subject)
-        {
-            return subject.FirstNonSpaceChar == '<';
-        }
-
         public bool Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return false;
-
             var saved = subject.Save();
 
             subject.AdvanceWhile(c => c == ' ', 3);

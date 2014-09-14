@@ -9,20 +9,8 @@ namespace CommonMarkSharp.BlockParsers
 {
     public class ATXHeaderParser : IBlockParser<ATXHeader>
     {
-        public string StartsWithChars
-        {
-            get { return " #"; }
-        }
-
-        public bool CanParse(Subject subject)
-        {
-            return subject.FirstNonSpaceChar == '#';
-        }
-
         public bool Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return false;
-
             var saved = subject.Save();
 
             subject.AdvanceWhile(c => c == ' ', 3);

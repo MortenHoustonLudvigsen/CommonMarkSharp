@@ -9,20 +9,8 @@ namespace CommonMarkSharp.BlockParsers
 {
     public class IndentedCodeParser : IBlockParser<IndentedCode>
     {
-        public string StartsWithChars
-        {
-            get { return " "; }
-        }
-
-        public bool CanParse(Subject subject)
-        {
-            return subject.Char == ' ';
-        }
-
         public bool Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return false;
-
             // Do not match if in a paragraph
             if (context.Tip is Paragraph) return false;
 

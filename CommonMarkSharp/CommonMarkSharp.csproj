@@ -38,11 +38,14 @@
     <Compile Include="BlockParsers\ATXHeaderParser.cs" />
     <Compile Include="BlockParsers\BlockQuoteParser.cs" />
     <Compile Include="BlockParsers\FencedCodeParser.cs" />
+    <Compile Include="BlockParsers\HorizontalRuleParser.cs" />
     <Compile Include="BlockParsers\HtmlBlockParser.cs" />
     <Compile Include="BlockParsers\IBlockParser.cs" />
     <Compile Include="BlockParsers\IBlockParserExtensions.cs" />
     <Compile Include="BlockParsers\IndentedCodeParser.cs" />
     <Compile Include="BlockParsers\LazyParagraphContinuationParser.cs" />
+    <Compile Include="BlockParsers\ListParser.cs" />
+    <Compile Include="BlockParsers\SetExtHeaderParser.cs" />
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
     <Compile Include="InlineParsers\AllParser.cs" />

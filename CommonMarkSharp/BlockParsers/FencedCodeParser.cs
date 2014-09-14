@@ -9,20 +9,8 @@ namespace CommonMarkSharp.BlockParsers
 {
     public class FencedCodeParser : IBlockParser<FencedCode>
     {
-        public string StartsWithChars
-        {
-            get { return " `~"; }
-        }
-
-        public bool CanParse(Subject subject)
-        {
-            return subject.FirstNonSpaceChar == '`' || subject.FirstNonSpaceChar == '~';
-        }
-
         public bool Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return false;
-
             var saved = subject.Save();
 
             var fenceOffset = subject.AdvanceWhile(c => c == ' ', 3);

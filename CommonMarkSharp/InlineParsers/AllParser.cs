@@ -24,6 +24,11 @@ namespace CommonMarkSharp.InlineParsers
         public string StartsWithChars { get; private set; }
         public int Max { get; private set; }
 
+        public bool CanParse(Subject subject)
+        {
+            return SignificantChars.Any() && SignificantChars.Contains(subject.Char);
+        }
+        
         public InlineString Parse(ParserContext context, Subject subject)
         {
             if (SignificantChars.Any())

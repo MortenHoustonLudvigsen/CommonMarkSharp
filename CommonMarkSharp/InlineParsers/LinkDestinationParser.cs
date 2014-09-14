@@ -40,6 +40,11 @@ namespace CommonMarkSharp.InlineParsers
 
         public string StartsWithChars { get { return null; } } // Any character
 
+        public bool CanParse(Subject subject)
+        {
+            return true;
+        }
+
         public LinkDestination Parse(ParserContext context, Subject subject)
         {
             if (!this.CanParse(subject)) return null;
@@ -82,6 +87,11 @@ namespace CommonMarkSharp.InlineParsers
             public IParser<Inline> ContentParser { get; private set; }
 
             public string StartsWithChars { get { return "("; } }
+
+            public bool CanParse(Subject subject)
+            {
+                return subject.Char == '(';
+            }
 
             public InlineList Parse(ParserContext context, Subject subject)
             {

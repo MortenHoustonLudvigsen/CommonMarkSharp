@@ -16,6 +16,11 @@ namespace CommonMarkSharp.InlineParsers
             get { return "<"; }
         }
 
+        public bool CanParse(Subject subject)
+        {
+            return subject.Char == '<';
+        }
+
         //    // htmltag = opentag | closetag | htmlcomment | processinginstruction |
         //    //           declaration | cdata;
 

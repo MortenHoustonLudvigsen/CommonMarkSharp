@@ -54,13 +54,5 @@ namespace CommonMarkSharp
             }
             return parts;
         }
-
-        public static bool CanParse<TPart>(this IParser<TPart> parser, Subject subject)
-            where TPart : Part
-        {
-            var canParse = parser.StartsWithChars == null;
-            canParse = canParse || parser.StartsWithChars.Contains(subject.Char);
-            return canParse;
-        }
     }
 }

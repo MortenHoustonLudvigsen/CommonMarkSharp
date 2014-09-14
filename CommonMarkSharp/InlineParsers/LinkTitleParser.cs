@@ -41,6 +41,11 @@ namespace CommonMarkSharp.InlineParsers
 
         public string StartsWithChars { get { return "\"'("; } }
 
+        public bool CanParse(Subject subject)
+        {
+            return subject.Char == '"' || subject.Char == '\'' || subject.Char == '(';
+        }
+
         public LinkTitle Parse(ParserContext context, Subject subject)
         {
             if (!this.CanParse(subject)) return null;

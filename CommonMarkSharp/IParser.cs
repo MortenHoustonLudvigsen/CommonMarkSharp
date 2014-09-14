@@ -10,6 +10,7 @@ namespace CommonMarkSharp
     public interface IParser<out T>
     {
         string StartsWithChars { get; }
+        bool CanParse(Subject subject);
         T Parse(ParserContext context, Subject subject);
     }
 }

@@ -65,6 +65,11 @@ namespace CommonMarkSharp
 
         public virtual string StartsWithChars { get { return _startsWithChars.Value; } }
 
+        public virtual bool CanParse(Subject subject)
+        {
+            return StartsWithChars == null || StartsWithChars.Contains(subject.Char);
+        }
+
         public virtual TPart Parse(ParserContext context, Subject subject)
         {
             InitializeInternal();

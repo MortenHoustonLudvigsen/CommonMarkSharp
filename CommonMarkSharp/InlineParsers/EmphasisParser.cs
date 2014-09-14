@@ -20,6 +20,11 @@ namespace CommonMarkSharp.InlineParsers
 
         public string StartsWithChars { get { return "*_"; } }
 
+        public bool CanParse(Subject subject)
+        {
+            return subject.Char == '*' || subject.Char == '_';
+        }
+
         public Inline Parse(ParserContext context, Subject subject)
         {
             if (!this.CanParse(subject)) return null;

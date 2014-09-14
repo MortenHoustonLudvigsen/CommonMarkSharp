@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace CommonMarkSharp
 {
     public interface IParser<out T>
+        where T: class
     {
         string StartsWithChars { get; }
         bool CanParse(Subject subject);

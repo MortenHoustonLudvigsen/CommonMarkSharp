@@ -19,7 +19,7 @@ namespace CommonMarkSharp.InlineParsers
 
         public InlineString Parse(ParserContext context, Subject subject)
         {
-            if (!this.CanParse(subject)) return null;
+            if (!CanParse(subject)) return null;
 
             return new InlineString(subject.TakeWhile(c => c == '`'));
         }

@@ -59,7 +59,6 @@
     <Compile Include="CommonMarkVisitor.cs" />
     <Compile Include="HandleInlinesVisitor.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
-    <Compile Include="InlineParsers\CompositeInlineParser.cs" />
     <Compile Include="InlineParsers\EscapedStringParser.cs" />
     <Compile Include="InlineParsers\AnyParser.cs" />
     <Compile Include="InlineParsers\AutolinkEmailParser.cs" />

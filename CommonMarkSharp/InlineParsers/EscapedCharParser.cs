@@ -21,7 +21,7 @@ namespace CommonMarkSharp.InlineParsers
 
         public InlineString Parse(ParserContext context, Subject subject)
         {
-            if (!this.CanParse(subject)) return null;
+            if (!CanParse(subject)) return null;
 
             if (subject.Char == '\\' && PunctuationChars.Contains(subject[1]))
             {

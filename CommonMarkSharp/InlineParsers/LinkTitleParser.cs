@@ -17,21 +17,21 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkTitleParser(Parsers parsers)
         {
-            _doubleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
+            _doubleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"""\", 1)
                 //new RegexStringParser(@"\G[^""\\]")
             ));
 
-            _singleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
+            _singleQuoteContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"'\", 1)
                 //new RegexStringParser(@"\G[^'\\]")
             ));
 
-            _paranthesesContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
+            _paranthesesContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@")\", 1)
@@ -48,7 +48,7 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkTitle Parse(ParserContext context, Subject subject)
         {
-            if (!this.CanParse(subject)) return null;
+            if (!CanParse(subject)) return null;
 
             var endChar = char.MinValue;
             var contentParser = (IParser<Inline>)null;

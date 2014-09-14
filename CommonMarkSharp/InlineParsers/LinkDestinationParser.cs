@@ -18,19 +18,19 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkDestinationParser(Parsers parsers)
         {
-            _braceContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
+            _braceContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(@"<>\")
             ));
 
-            _destContentParser = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
+            _destContentParser = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new AllExceptParser(Patterns.ControlChars + @"()\&")
             ));
 
-            _destContentParserWithParantheses = new Lazy<IParser<Inline>>(() => new CompositeInlineParser(
+            _destContentParserWithParantheses = new Lazy<IParser<Inline>>(() => new CompositeParser<Inline>(
                 parsers.EntityParser,
                 parsers.EscapedCharParser,
                 new DestParanthesesParser(_destContentParser.Value),
@@ -47,7 +47,7 @@ namespace CommonMarkSharp.InlineParsers
 
         public LinkDestination Parse(ParserContext context, Subject subject)
         {
-            if (!this.CanParse(subject)) return null;
+            if (!CanParse(subject)) return null;
 
             var savedSubject = subject.Save();
             var inlines = new List<Inline>();

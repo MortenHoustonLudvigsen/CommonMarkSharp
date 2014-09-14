@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonMarkSharp.Inlines;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,19 +7,35 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class EscapedStringParser : CompositeInlineParser
+    public class EscapedStringParser : IParser<InlineString>
     {
         public EscapedStringParser(Parsers parsers)
-            : base(true)
         {
             Parsers = parsers;
+            OthersParser = new Lazy<IParser<InlineString>>(() => new AllExceptParser(parsers.EscapedCharParser.StartsWithChars));
         }
-    
-        public Parsers Parsers { get; private set; }
 
-        protected override void Initialize()
+        public Parsers Parsers { get; private set; }
+        public Lazy<IParser<InlineString>> OthersParser { get; private set; }
+
+        public string StartsWithChars
         {
-            Register(Parsers.EscapedCharParser);
+            get { return null; }
+        }
+
+        public bool CanParse(Subject subject)
+        {
+            return true;
+        }
+
+        public InlineString Parse(ParserContext context, Subject subject)
+        {
+            var inline = Parsers.EscapedCharParser.Parse(context, subject);
+            if (inline == null)
+            {
+                inline = OthersParser.Value.Parse(context, subject);
+            }
+            return inline;
         }
     }
 }

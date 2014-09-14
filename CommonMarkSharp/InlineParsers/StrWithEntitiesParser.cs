@@ -7,19 +7,39 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp.InlineParsers
 {
-    public class StrWithEntitiesParser : CompositeInlineParser
+    public class StrWithEntitiesParser : IParser<InlineString>
     {
         public StrWithEntitiesParser(Parsers parsers)
-            : base(true)
         {
             Parsers = parsers;
+            OthersParser = new Lazy<IParser<InlineString>>(() => new AllExceptParser(parsers.EntityParser.StartsWithChars));
         }
 
         public Parsers Parsers { get; private set; }
+        public Lazy<IParser<InlineString>> OthersParser { get; private set; }
 
-        protected override void Initialize()
+        public string StartsWithChars
         {
-            Register(Parsers.EntityParser);
+            get { return null; }
+        }
+
+        public bool CanParse(Subject subject)
+        {
+            return true;
+        }
+
+        public InlineString Parse(ParserContext context, Subject subject)
+        {
+            var inline = (InlineString)Parsers.EntityParser.Parse(context, subject);
+            if (inline == null)
+            {
+                inline = OthersParser.Value.Parse(context, subject);
+            }
+            if (inline == null)
+            {
+                inline = new InlineString(subject.Take());
+            }
+            return inline;
         }
     }
 }

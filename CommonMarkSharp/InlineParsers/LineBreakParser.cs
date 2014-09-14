@@ -20,7 +20,7 @@ namespace CommonMarkSharp.InlineParsers
 
         public LineBreak Parse(ParserContext context, Subject subject)
         {
-            if (!this.CanParse(subject)) return null;
+            if (!CanParse(subject)) return null;
 
             var savedSubject = subject.Save();
 

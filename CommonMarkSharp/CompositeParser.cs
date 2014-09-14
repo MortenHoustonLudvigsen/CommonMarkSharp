@@ -9,82 +9,44 @@ using System.Threading.Tasks;
 
 namespace CommonMarkSharp
 {
-    public class CompositeParser<TPart> : IParser<TPart>
-        where TPart : Part
+    public class CompositeParser<T> : IParser<T>
+        where T: class
     {
-        public CompositeParser(params IParser<TPart>[] parsers)
+        public CompositeParser(params IParser<T>[] parsers)
         {
-            _startsWithChars = new Lazy<string>(() =>
+            _parsers = parsers.ToList();
+            if (_parsers.Any(p => p.StartsWithChars == null))
             {
-                InitializeInternal();
-                if (_parsers.Any(p => p.StartsWithChars == null))
-                {
-                    return null;
-                }
-                return new string(_parsers.SelectMany(p => p.StartsWithChars).Distinct().ToArray());
-            });
-            Register(parsers);
-        }
-
-        private readonly Lazy<string> _startsWithChars;
-        private readonly List<IParser<TPart>> _parsers = new List<IParser<TPart>>();
-
-        private bool _initialized = false;
-        private void InitializeInternal()
-        {
-            if (!_initialized)
+                StartsWithChars = null;
+            }
+            else
             {
-                _initialized = true;
-                Initialize();
+                StartsWithChars = new string(_parsers.SelectMany(p => p.StartsWithChars).Distinct().ToArray());
             }
         }
 
-        protected virtual void Initialize()
-        {
-        }
+        private readonly IEnumerable<IParser<T>> _parsers;
 
-        public void Register(params IParser<TPart>[] parsers)
-        {
-            Register(parsers.AsEnumerable());
-        }
-
-        public void Register(IEnumerable<IParser<TPart>> parsers)
-        {
-            foreach (var parser in parsers)
-            {
-                Register(parser);
-            }
-        }
-
-        public void Register(IParser<TPart> parser)
-        {
-            InitializeInternal();
-            if (parser == null) throw new ArgumentNullException("parser");
-            _parsers.Add(parser);
-        }
-
-        public virtual string StartsWithChars { get { return _startsWithChars.Value; } }
+        public virtual string StartsWithChars { get; private set; }
 
         public virtual bool CanParse(Subject subject)
         {
             return StartsWithChars == null || StartsWithChars.Contains(subject.Char);
         }
 
-        public virtual TPart Parse(ParserContext context, Subject subject)
+        public virtual T Parse(ParserContext context, Subject subject)
         {
-            InitializeInternal();
-            if (!this.CanParse(subject)) return null;
-            var savedSubject = subject.Save();
+            if (!CanParse(subject)) return null;
+
             foreach (var parser in _parsers)
             {
-                var part = parser.Parse(context, subject);
-                if (part != null)
+                var result = parser.Parse(context, subject);
+                if (result != null)
                 {
-                    return part;
+                    return result;
                 }
             }
 
-            savedSubject.Restore();
             return null;
         }
     }

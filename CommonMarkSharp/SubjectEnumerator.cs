@@ -30,15 +30,14 @@ namespace CommonMarkSharp
 
         public bool MoveNext()
         {
-            if (_enumerator.MoveNext())
-            {
-                Index += 1;
-                Current = _enumerator.Current;
-                return true;
-            }
             if (!EndOfString)
             {
                 Index += 1;
+                if (_enumerator.MoveNext())
+                {
+                    Current = _enumerator.Current;
+                    return true;
+                }
                 Current = char.MinValue;
                 EndOfString = true;
             }

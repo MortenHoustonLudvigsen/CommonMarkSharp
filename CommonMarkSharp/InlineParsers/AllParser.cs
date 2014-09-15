@@ -6,29 +6,24 @@ namespace CommonMarkSharp.InlineParsers
 {
     public class AllParser : IInlineParser<InlineString>
     {
-        public AllParser(string significantChars, int max = int.MaxValue)
-            : this(new HashSet<char>(significantChars), max)
-        {
-        }
-
-        public AllParser(HashSet<char> significantChars, int max = int.MaxValue)
+        public AllParser(CharSet significantChars, int max = int.MaxValue)
         {
             SignificantChars = significantChars;
             Max = max;
         }
 
-        public HashSet<char> SignificantChars { get; private set; }
+        public CharSet SignificantChars { get; private set; }
         public string StartsWithChars { get; private set; }
         public int Max { get; private set; }
 
         public bool CanParse(Subject subject)
         {
-            return SignificantChars.Any() && SignificantChars.Contains(subject.Char);
+            return SignificantChars.Any && SignificantChars.Contains(subject.Char);
         }
         
         public InlineString Parse(ParserContext context, Subject subject)
         {
-            if (SignificantChars.Any())
+            if (SignificantChars.Any)
             {
                 var chars = subject.TakeWhile(c => SignificantChars.Contains(c), Max);
                 if (chars.Any())

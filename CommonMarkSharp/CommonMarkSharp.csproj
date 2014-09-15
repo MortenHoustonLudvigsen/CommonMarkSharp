@@ -47,6 +47,7 @@
     <Compile Include="BlockParsers\ListParser.cs" />
     <Compile Include="BlockParsers\SetExtHeaderParser.cs" />
     <Compile Include="Blocks\LeafBlockWithInlines.cs" />
+    <Compile Include="CharSet.cs" />
     <Compile Include="CommonMark.cs" />
     <Compile Include="InlineParsers\AllExceptParser.cs" />
     <Compile Include="InlineParsers\AllParser.cs" />

@@ -19,7 +19,7 @@ namespace CommonMarkSharp.BlockParsers
 
         private static readonly int _maxTagNameLength = _tagNames.Select(t => t.Length).Max();
 
-        private static readonly HashSet<char> _tagNameChars = new HashSet<char>(
+        private static readonly CharSet _tagNameChars = new CharSet(
             _tagNames.SelectMany(t => t).Distinct().Concat(_tagNames.SelectMany(t => t.ToUpper()).Distinct())
         );
 

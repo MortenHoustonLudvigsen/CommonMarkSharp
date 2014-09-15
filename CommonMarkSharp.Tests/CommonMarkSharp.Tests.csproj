@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CharSetTests.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Specs.cs">
       <AutoGen>True</AutoGen>

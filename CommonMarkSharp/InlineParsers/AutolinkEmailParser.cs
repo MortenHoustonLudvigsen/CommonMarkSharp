@@ -9,9 +9,9 @@ namespace CommonMarkSharp.InlineParsers
         private const string _alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         private const string _digits = "0123456789";
         private const string _alphanums = _alphas + _digits;
-        private static readonly HashSet<char> _emailNameChars = new HashSet<char>(_alphanums + ".!#$%&'*+/=?^_`{|}~-");
-        private static readonly HashSet<char> _domainNameStartChars = new HashSet<char>(_alphanums);
-        private static readonly HashSet<char> _domainNameChars = new HashSet<char>(_alphanums + "-");
+        private static readonly CharSet _emailNameChars = _alphanums + ".!#$%&'*+/=?^_`{|}~-";
+        private static readonly CharSet _domainNameStartChars = _alphanums;
+        private static readonly CharSet _domainNameChars = _alphanums + "-";
 
         public AutolinkEmailParser(Parsers parsers)
         {

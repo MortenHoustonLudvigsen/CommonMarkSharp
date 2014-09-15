@@ -158,7 +158,7 @@ namespace CommonMarkSharp.InlineParsers
         }
 
         // declaration = "<!" [A-Z]+ spacechar+ [^>\x00]* ">";
-        private static readonly HashSet<char> _declarationChars = new HashSet<char>(Patterns.UpperCaseAlphas);
+        private static readonly CharSet _declarationChars = Patterns.UpperCaseAlphas;
         private bool MatchDeclaration(Subject subject)
         {
             if (!subject.StartsWith("<!"))
@@ -271,7 +271,7 @@ namespace CommonMarkSharp.InlineParsers
         }
 
         // unquotedvalue = [^\"'=<>`\x00]+;
-        private static readonly HashSet<char> _unquotedValueChars = new HashSet<char>("\"'=<>`");
+        private static readonly CharSet _unquotedValueChars = "\"'=<>`";
         private bool MatchUnquotedValue(Subject subject)
         {
             if (subject.AdvanceWhile(c => !_unquotedValueChars.Contains(c)) > 0)
@@ -320,8 +320,8 @@ namespace CommonMarkSharp.InlineParsers
         }
 
         // attributename = [a-zA-Z_:][a-zA-Z0-9:._-]*;
-        private static readonly HashSet<char> _attributeNameStartChars = new HashSet<char>(Patterns.Alphas + "_:");
-        private static readonly HashSet<char> _attributeNameChars = new HashSet<char>(Patterns.Alphanums + ":._-");
+        private static readonly CharSet _attributeNameStartChars = Patterns.Alphas + "_:";
+        private static readonly CharSet _attributeNameChars = Patterns.Alphanums + ":._-";
         private bool MatchAttributeName(Subject subject)
         {
             if (_attributeNameStartChars.Contains(subject.Char))
@@ -333,8 +333,8 @@ namespace CommonMarkSharp.InlineParsers
         }
 
         // tagname = [A-Za-z][A-Za-z0-9]*;
-        private static readonly HashSet<char> _tagNameStartChars = new HashSet<char>(Patterns.Alphas);
-        private static readonly HashSet<char> _tagNameChars = new HashSet<char>(Patterns.Alphanums);
+        private static readonly CharSet _tagNameStartChars = Patterns.Alphas;
+        private static readonly CharSet _tagNameChars = Patterns.Alphanums;
         private bool MatchTagName(Subject subject)
         {
             if (_tagNameStartChars.Contains(subject.Char))

@@ -48,7 +48,7 @@ namespace CommonMarkSharp.InlineParsers
             "ventrilo", "view-source", "webcal", "wtai", "wyciwyg", "xfire", "xri", "ymsgr"
         }, StringComparer.OrdinalIgnoreCase);
 
-        private static readonly HashSet<char> _nonUriChars = new HashSet<char>(Patterns.ControlChars + "<>");
+        private static readonly CharSet _nonUriChars = Patterns.ControlChars + "<>";
 
         public AutolinkParser(Parsers parsers)
         {

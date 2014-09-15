@@ -5,7 +5,7 @@ namespace CommonMarkSharp.InlineParsers
 {
     public class EscapedCharParser : IInlineParser<InlineString>
     {
-        public static readonly HashSet<char> PunctuationChars = new HashSet<char>(@"!""#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
+        public static readonly CharSet PunctuationChars = @"!""#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
 
         public string StartsWithChars { get { return "\\"; } }
 

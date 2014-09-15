@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace CommonMarkSharp
 {
     public abstract class CommonMarkVisitor
     {
-        private readonly Dictionary<Type, Visitor> _visitors;
+        private readonly Dictionary<Type, VisitorDelegate> _visitors;
 
         public CommonMarkVisitor()
         {
@@ -20,12 +22,12 @@ namespace CommonMarkSharp
         public void Add<TPart>(Action<TPart> visitor)
             where TPart : Part
         {
-            _visitors[typeof(TPart)] = new Visitor(visitor.Target, visitor.Method);
+            _visitors[typeof(TPart)] = CreateDelegate(visitor.Target, visitor.Method);
         }
 
-        private Visitor FindVisitor(Type partType)
+        private VisitorDelegate FindVisitor(Type partType)
         {
-            Visitor visitor = null;
+            VisitorDelegate visitor = null;
             if (!_visitors.TryGetValue(partType, out visitor))
             {
                 if (partType != typeof(Part) && partType != typeof(object))
@@ -46,7 +48,7 @@ namespace CommonMarkSharp
                 _currents.Push(part);
                 try
                 {
-                    visitor.Visit(part);
+                    visitor(part);
                 }
                 finally
                 {
@@ -55,9 +57,36 @@ namespace CommonMarkSharp
             }
         }
 
+        private delegate void VisitorDelegate(Part part);
+        private static VisitorDelegate CreateDelegate(object target, MethodInfo method)
+        {
+            var dynam = new DynamicMethod(
+                method.Name,
+                typeof(void),
+                new[] { typeof(object), typeof(Part) },
+                method.DeclaringType
+            );
+
+            var il = dynam.GetILGenerator();
+
+            // Argument 0 of dynamic method is target instance.
+            il.Emit(OpCodes.Ldarg_0);
+
+            // Argument 1 of dynamic method is the part.
+            il.Emit(OpCodes.Ldarg_1);
+
+            // Call method
+            il.Emit(OpCodes.Callvirt, method);
+
+            // Emit return opcode.
+            il.Emit(OpCodes.Ret);
+
+            return (VisitorDelegate)dynam.CreateDelegate(typeof(VisitorDelegate), target);
+        }
+
         private class VisitorInfo
         {
-            public static Dictionary<Type, Visitor> GetVisitors(CommonMarkVisitor visitor, string name)
+            public static Dictionary<Type, VisitorDelegate> GetVisitors(CommonMarkVisitor visitor, string name)
             {
                 return visitor
                     .GetType()
@@ -65,7 +94,7 @@ namespace CommonMarkSharp
                     .Where(m => m.Name == name)
                     .Select(m => new VisitorInfo(m))
                     .Where(m => m.IsValid)
-                    .ToDictionary(m => m.PartType, m => new Visitor(visitor, m.Method));
+                    .ToDictionary(m => m.PartType, m => CreateDelegate(visitor, m.Method));
             }
 
             public VisitorInfo(MethodInfo method)
@@ -86,22 +115,6 @@ namespace CommonMarkSharp
                     return false;
                 }
                 return typeof(T).IsAssignableFrom(Parameters[index].ParameterType);
-            }
-        }
-
-        private class Visitor
-        {
-            public Visitor(object target, MethodInfo method)
-            {
-                Target = target;
-                Method = method;
-            }
-
-            public object Target { get; private set; }
-            public MethodInfo Method { get; private set; }
-            public void Visit(Part part)
-            {
-                Method.Invoke(Target, new[] { part });
             }
         }
     }

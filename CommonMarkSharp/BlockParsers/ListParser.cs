@@ -13,23 +13,26 @@ namespace CommonMarkSharp.BlockParsers
             var ok = false;
             var spacesAfterMarker = 0;
             var data = new ListData();
-            var startIndex = subject.Index;
+            var length = 0;
             if (subject.Char == '*' || subject.Char == '+' || subject.Char == '-')
             {
                 data.Type = "Bullet";
                 data.BulletChar = subject.Char;
                 subject.Advance();
+                length += 1;
                 ok = true;
             }
             else if (Patterns.Digits.Contains(subject.Char))
             {
                 var start = subject.TakeWhile(c => Patterns.Digits.Contains(c));
+                length += start.Length;
                 if (subject.Char == '.' || subject.Char == ')')
                 {
                     data.Type = "Ordered";
                     data.Start = int.Parse(start);
                     data.Delimiter = subject.Char;
                     subject.Advance();
+                    length += 1;
                     ok = true;
                 }
             }
@@ -42,7 +45,7 @@ namespace CommonMarkSharp.BlockParsers
                 return false;
             }
 
-            data.Padding = subject.Index - startIndex;
+            data.Padding = length + spacesAfterMarker;
             if (spacesAfterMarker >= 5 || spacesAfterMarker < 1 || subject.EndOfString)
             {
                 data.Padding = data.Padding - spacesAfterMarker + 1;

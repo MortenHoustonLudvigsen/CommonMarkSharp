@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace CommonMarkSharp
 {
-    public class Subject
+    public class Subject : IDisposable
     {
         private static readonly string[] _emptyGroups = new string[0];
 
@@ -12,49 +14,16 @@ namespace CommonMarkSharp
             Text = text ?? "";
             _length = Text.Length;
             _firstNonSpace = null;
-            _index = 0;
-
-            if (_length == 0)
-            {
-                EndOfString = true;
-                Char = char.MinValue;
-            }
-            else
-            {
-                EndOfString = false;
-                Char = Text[0];
-            }
+            _enumerator = new SubjectEnumerator(Text);
         }
 
         public string Text;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SetIndex(int value)
-        {
-            if (value >= _length)
-            {
-                _index = _length;
-                EndOfString = true;
-                Char = char.MinValue;
-            }
-            else
-            {
-                _index = value;
-                EndOfString = false;
-                Char = Text[value];
-            }
-            _firstNonSpace = null;
-        }
+        private SubjectEnumerator _enumerator;
 
         private int _length;
-        private int _index;
-        public int Index
-        {
-            get { return _index; }
-        }
 
-        public char Char;
-        public bool EndOfString;
+        public char Char { get { return _enumerator.Current; } }
+        public bool EndOfString { get { return _enumerator.EndOfString; } }
 
         private int? _firstNonSpace;
         public int FirstNonSpace
@@ -63,7 +32,7 @@ namespace CommonMarkSharp
             {
                 if (_firstNonSpace == null)
                 {
-                    _firstNonSpace = _index + CountWhile(' ');
+                    _firstNonSpace = _enumerator.Index + CountWhile(' ');
                 }
                 return _firstNonSpace.Value;
             }
@@ -71,12 +40,12 @@ namespace CommonMarkSharp
 
         public char FirstNonSpaceChar { get { return GetChar(FirstNonSpace); } }
         public bool IsBlank { get { return FirstNonSpace == _length; } }
-        public int Indent { get { return FirstNonSpace - _index; } }
-        public string Rest { get { return EndOfString ? "" : Text.Substring(_index); } }
+        public int Indent { get { return FirstNonSpace - _enumerator.Index; } }
+        public string Rest { get { return EndOfString ? "" : Text.Substring(_enumerator.Index); } }
 
         public char this[int relativeIndex]
         {
-            get { return GetChar(_index + relativeIndex); }
+            get { return GetChar(_enumerator.Index + relativeIndex); }
         }
 
         private bool ValidIndex(int index)
@@ -94,51 +63,58 @@ namespace CommonMarkSharp
             return new SavedSubject(this);
         }
 
-        public int Advance(int count = 1)
+        public bool Advance()
         {
-            var originalIndex = _index;
-            SetIndex(_index + count);
-            return _index - originalIndex;
+            _firstNonSpace = null;
+            return _enumerator.MoveNext();
         }
 
-        public int AdvanceWhile(char c)
+        public int Advance(int count)
         {
-            return Advance(CountWhile(c));
+            if (EndOfString)
+            {
+                return 0;
+            }
+            _firstNonSpace = null;
+            var advanced = 0;
+            while (advanced < count && _enumerator.MoveNext())
+            {
+                advanced += 1;
+            }
+            return advanced;
         }
 
-        public int AdvanceWhile(char c, int max)
+        public int AdvanceWhile(char c, int max = int.MaxValue)
         {
-            return Advance(CountWhile(c, max));
+            return AdvanceWhile(x => c == x, max);
         }
 
-        public int AdvanceWhileNot(char c)
+        public int AdvanceWhileNot(char c, int max = int.MaxValue)
         {
-            return Advance(CountWhileNot(c));
+            return AdvanceWhile(x => c != x);
         }
 
-        public int AdvanceWhileNot(char c, int max)
+        public int AdvanceWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
-            return Advance(CountWhileNot(c, max));
-        }
-
-        public int AdvanceWhile(Func<char, bool> predicate)
-        {
-            return Advance(CountWhile(predicate));
-        }
-
-        public int AdvanceWhile(Func<char, bool> predicate, int max)
-        {
-            return Advance(CountWhile(predicate, max));
+            if (EndOfString)
+            {
+                return 0;
+            }
+            var advanced = 0;
+            var valid = true;
+            _firstNonSpace = null;
+            while (valid && predicate(_enumerator.Current) && advanced < max)
+            {
+                advanced += 1;
+                valid = _enumerator.MoveNext();
+            }
+            return advanced;
         }
 
         public void AdvanceToFirstNonSpace(int offset = 0)
         {
-            SetIndex(FirstNonSpace + offset);
-        }
-
-        public void AdvanceToEnd(int offset = 0)
-        {
-            SetIndex(_length + offset);
+            AdvanceWhile(' ');
+            Advance(offset);
         }
 
         public char Take()
@@ -154,116 +130,73 @@ namespace CommonMarkSharp
 
         public string Take(int count)
         {
-            var result = Text.Substring(_index, count);
+            var result = Text.Substring(_enumerator.Index, count);
             Advance(count);
             return result;
         }
 
-        public string TakeWhile(char c)
+        public string TakeWhile(char c, int max = int.MaxValue)
         {
-            return Take(CountWhile(c));
+            return TakeWhile(x => c == x, max);
         }
 
-        public string TakeWhile(char c, int max)
+        public string TakeWhileNot(char c, int max = int.MaxValue)
         {
-            return Take(CountWhile(c, max));
+            return TakeWhile(x => c != x, max);
         }
 
-        public string TakeWhileNot(char c)
+        public string TakeWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
-            return Take(CountWhileNot(c));
-        }
-
-        public string TakeWhileNot(char c, int max)
-        {
-            return Take(CountWhileNot(c, max));
-        }
-
-        public string TakeWhile(Func<char, bool> predicate)
-        {
-            return Take(CountWhile(predicate));
-        }
-
-        public string TakeWhile(Func<char, bool> predicate, int max)
-        {
-            return Take(CountWhile(predicate, max));
-        }
-
-        public int CountWhile(char c)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && Text[index] == c)
+            if (EndOfString)
             {
-                index += 1;
-                count += 1;
+                return "";
             }
-            return count;
+            StringBuilder result = null;
+            var advanced = 0;
+            var valid = true;
+            _firstNonSpace = null;
+            while (valid && predicate(_enumerator.Current) && advanced < max)
+            {
+                result = result ?? new StringBuilder(_length);
+                result.Append(_enumerator.Current);
+                advanced += 1;
+                valid = _enumerator.MoveNext();
+            }
+            return result != null ? result.ToString() : "";
         }
 
-        public int CountWhile(char c, int max)
+        public int CountWhile(char c, int max = int.MaxValue)
         {
-            var count = 0;
-            var index = _index;
-            while (index < _length && count < max && Text[index] == c)
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
+            return CountWhile(x => c == x, max);
         }
 
-        public int CountWhileNot(char c)
+        public int CountWhileNot(char c, int max = int.MaxValue)
         {
-            var count = 0;
-            var index = _index;
-            while (index < _length && Text[index] != c)
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
+            return CountWhile(x => c != x, max);
         }
 
-        public int CountWhileNot(char c, int max)
+        public int CountWhile(Func<char, bool> predicate, int max = int.MaxValue)
         {
-            var count = 0;
-            var index = _index;
-            while (index < _length && count < max && Text[index] != c)
+            if (EndOfString)
             {
-                index += 1;
-                count += 1;
+                return 0;
             }
-            return count;
-        }
-
-        public int CountWhile(Func<char, bool> predicate)
-        {
             var count = 0;
-            var index = _index;
-            while (index < _length && predicate(Text[index]))
+            using (var enumerator = _enumerator.Clone())
             {
-                index += 1;
-                count += 1;
+                var valid = true;
+                while (valid && predicate(enumerator.Current) && count < max)
+                {
+                    count += 1;
+                    valid = enumerator.MoveNext();
+                }
+                return count;
             }
-            return count;
-        }
-
-        public int CountWhile(Func<char, bool> predicate, int max)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && count < max && predicate(Text[index]))
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
         }
 
         public bool Contains(char c, int relativeIndex = 0)
         {
-            var index = Math.Max(0, _index + relativeIndex);
+            var index = Math.Max(0, _enumerator.Index + relativeIndex);
             if (index >= _length)
             {
                 return false;
@@ -273,7 +206,7 @@ namespace CommonMarkSharp
 
         public bool Contains(string str, int relativeIndex = 0)
         {
-            var index = Math.Max(0, _index + relativeIndex);
+            var index = Math.Max(0, _enumerator.Index + relativeIndex);
             if (index >= _length)
             {
                 return false;
@@ -283,7 +216,7 @@ namespace CommonMarkSharp
 
         public bool StartsWith(string str, int relativeIndex = 0)
         {
-            var index = _index + relativeIndex;
+            var index = _enumerator.Index + relativeIndex;
             if (index + str.Length > _length)
             {
                 return false;
@@ -301,7 +234,7 @@ namespace CommonMarkSharp
 
         public bool PartOfSequence(char c, int count)
         {
-            var index = _index;
+            var index = _enumerator.Index;
             while (index > 0 && Text[index] == c)
             {
                 index -= 1;
@@ -335,11 +268,38 @@ namespace CommonMarkSharp
             return IsWhiteSpace(this[relativeIndex]);
         }
 
+        private bool _disposed = false;
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern. 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+                if (_enumerator != null)
+                {
+                    _enumerator.Dispose();
+                    _enumerator = null;
+                }
+            }
+            _disposed = true;
+        }
+
 #if DEBUG
 
         public override string ToString()
         {
-            return string.Format("{0}↑{1}", Escape(Text.Substring(0, _index)), Escape(Text.Substring(_index)));
+            return string.Format("{0}↑{1}", Escape(Text.Substring(0, _enumerator.Index)), Escape(Text.Substring(_enumerator.Index)));
         }
 
         public static string Escape(string input)
@@ -362,27 +322,28 @@ namespace CommonMarkSharp
             public SavedSubject(Subject subject)
             {
                 _subject = subject;
-                _index = _subject._index;
+                _enumerator = subject._enumerator.Clone();
             }
 
             private Subject _subject;
-            private int _index;
+            private SubjectEnumerator _enumerator;
 
             public void Restore()
             {
-                _subject.SetIndex(_index);
+                _subject._enumerator.Dispose();
+                _subject._enumerator = _enumerator;
             }
 
             public string GetLiteral()
             {
-                return _subject.Text.Substring(_index, _subject.Index - _index);
+                return _subject.Text.Substring(_enumerator.Index, _subject._enumerator.Index - _enumerator.Index);
             }
 
 #if DEBUG
 
             public override string ToString()
             {
-                return string.Format("{0}↑{1}↑{2}", Escape(_subject.Text.Substring(0, _index)), Escape(_subject.Text.Substring(_index, _subject.Index - _index)), Escape(_subject.Text.Substring(_subject.Index)));
+                return string.Format("{0}↑{1}↑{2}", Escape(_subject.Text.Substring(0, _enumerator.Index)), Escape(_subject.Text.Substring(_enumerator.Index, _subject._enumerator.Index - _enumerator.Index)), Escape(_subject.Text.Substring(_subject._enumerator.Index)));
             }
 
 #endif

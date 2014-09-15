@@ -22,6 +22,8 @@ namespace CommonMarkSharp.Tests
             // Arrange
             var commonMark = Helpers.Normalize("*_*_");
             var expected = Helpers.Normalize("<p><em>_</em>_</p>");
+            Helpers.LogValue("CommonMark", commonMark);
+            Helpers.LogValue("Expected", expected);
 
             // Act
             var actual = _cm.RenderAsHtml(commonMark);
@@ -41,6 +43,8 @@ namespace CommonMarkSharp.Tests
             // Arrange
             var commonMark = Helpers.Normalize("*a _b _c d_ e*");
             var expected = Helpers.Normalize("<p><em>a <em>b _c d</em> e</em></p>");
+            Helpers.LogValue("CommonMark", commonMark);
+            Helpers.LogValue("Expected", expected);
 
             // Act
             var actual = _cm.RenderAsHtml(commonMark);

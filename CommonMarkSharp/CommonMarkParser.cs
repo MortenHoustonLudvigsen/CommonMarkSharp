@@ -160,19 +160,25 @@ namespace CommonMarkSharp
                 else if (context.Container is FencedCode)
                 {
                     var fencedCode = context.Container as FencedCode;
-                    // check for closing code fence:
-                    var match =
-                        subject.Indent <= 3 &&
-                        subject.FirstNonSpaceChar == fencedCode.Char &&
-                        Patterns.CloseCodeFenceRe.IsMatch(subject.Text, subject.FirstNonSpace, out groups);
+                    var saved = subject.Save();
 
-                    if (match && groups[0].Length >= fencedCode.Length)
+                    // check for closing code fence:
+                    var match = subject.Indent <= 3;
+                    subject.AdvanceWhile(c => c == ' ');
+                    match = match &&
+                        subject.Char == fencedCode.Char &&
+                        subject.AdvanceWhile(c => c == fencedCode.Char) >= fencedCode.Length;
+
+                    subject.AdvanceWhile(c => c == ' ');
+
+                    if (match && subject.EndOfString)
                     {
                         // don't add closing fence to context.Container; instead, close it:
                         context.Container.Close(context);
                     }
                     else
                     {
+                        saved.Restore();
                         context.Tip.AddLine(subject.Rest);
                     }
                 }
@@ -247,25 +253,17 @@ namespace CommonMarkSharp
             var result = (StringBuilder)null;
             var pos = 0;
             var start = 0;
-            for (var i = 0; i < line.Length; i++)
+            var nextTab = line.IndexOf('\t');
+            while (nextTab >= 0)
             {
-                var c = line[i];
-                if (c == '\t')
-                {
-                    if (result == null)
-                    {
-                        result = new StringBuilder(line.Length + 30);
-                    }
-                    result.Append(line, start, i - start);
-                    var count = tabWidth - pos % tabWidth;
-                    pos += count;
-                    start = i + 1;
-                    result.Append(new string(' ', count));
-                }
-                else
-                {
-                    pos += 1;
-                }
+                result = result ?? new StringBuilder(line.Length + 30);
+                result.Append(line, start, nextTab - start);
+                pos += nextTab - start;
+                var count = tabWidth - pos % tabWidth;
+                pos += count;
+                start = nextTab + 1;
+                result.Append(new string(' ', count));
+                nextTab = line.IndexOf('\t', start);
             }
             if (result != null)
             {

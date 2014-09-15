@@ -9,7 +9,7 @@ namespace CommonMarkSharp
         protected bool InAttribute { get; set; }
 
         protected virtual void WriteAttribute<T>(string attribute, T value, bool includeEmptyAttribute, Func<T, bool> shouldWriteAttribute, Action<T> writeValue)
-            where T: class
+            where T : class
         {
             if (includeEmptyAttribute || shouldWriteAttribute(value))
             {
@@ -26,7 +26,7 @@ namespace CommonMarkSharp
 
         protected virtual void WriteAttribute(string attribute, string value, bool includeEmptyAttribute = false)
         {
-            WriteAttribute(attribute, value, includeEmptyAttribute, v => !string.IsNullOrEmpty(v), v => Write(v));
+            WriteAttribute(attribute, value, includeEmptyAttribute, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
         }
 
         protected virtual void WriteAttribute(string attribute, Part part, bool includeEmptyAttribute = false)
@@ -39,21 +39,74 @@ namespace CommonMarkSharp
             WriteAttribute(attribute, parts, includeEmptyAttribute, p => p != null && p.Any(), p => p.Accept(this));
         }
 
-        protected virtual string Escape(string str, bool preserveEntities = false)
+        protected virtual void WriteEscaped(string str, bool preserveEntities = false)
         {
-            if (!preserveEntities)
+            var chars = preserveEntities ? new[] { '<', '>', '"' } : new[] { '&', '<', '>', '"' };
+
+            var start = 0;
+            var pos = str.IndexOfAny(chars);
+            while (pos >= 0)
             {
-                str = str.Replace("&", "&amp;");
+                if (pos > start)
+                {
+                    Write(str.Substring(start, pos - start));
+                }
+                switch (str[pos])
+                {
+                    case '&':
+                        Write("&amp;");
+                        break;
+                    case '<':
+                        Write("&lt;");
+                        break;
+                    case '>':
+                        Write("&gt;");
+                        break;
+                    case '"':
+                        Write("&quot;");
+                        break;
+                }
+                start = pos + 1;
+                pos = str.IndexOfAny(chars, start);
             }
-            str = str.Replace("<", "&lt;");
-            str = str.Replace(">", "&gt;");
-            str = str.Replace("\"", "&quot;");
-            return str;
+
+            if (start == 0)
+            {
+                Write(str);
+            }
+            else
+            {
+                Write(str.Substring(start));
+            }
         }
 
-        protected virtual string EscapeInAttribute(string str)
+        protected virtual void WriteEscapedInAttribute(string str, bool preserveEntities = false)
         {
-            return InAttribute ? Escape(str) : str;
+            if (InAttribute)
+            {
+                WriteEscaped(str);
+            }
+            else
+            {
+                Write(str);
+            }
         }
+
+        //protected virtual string Escape(string str, bool preserveEntities = false)
+        //{
+        //    if (!preserveEntities)
+        //    {
+        //        str = str.Replace("&", "&amp;");
+        //    }
+        //    str = str.Replace("<", "&lt;");
+        //    str = str.Replace(">", "&gt;");
+        //    str = str.Replace("\"", "&quot;");
+        //    return str;
+        //}
+
+        //protected virtual string EscapeInAttribute(string str)
+        //{
+        //    return InAttribute ? Escape(str) : str;
+        //}
     }
 }

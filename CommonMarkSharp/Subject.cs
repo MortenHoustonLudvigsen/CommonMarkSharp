@@ -12,7 +12,7 @@ namespace CommonMarkSharp
             Text = text ?? "";
             _length = Text.Length;
             _firstNonSpace = null;
-            _index = 0;
+            Index = 0;
 
             if (_length == 0)
             {
@@ -26,35 +26,33 @@ namespace CommonMarkSharp
             }
         }
 
+        private int _length;
+        public int Index;
+        public char Char;
+        public bool EndOfString;
         public string Text;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetIndex(int value)
         {
-            if (value >= _length)
+            if (value != Index)
             {
-                _index = _length;
-                EndOfString = true;
-                Char = char.MinValue;
+                if (value >= _length)
+                {
+                    Index = _length;
+                    EndOfString = true;
+                    Char = char.MinValue;
+                }
+                else
+                {
+                    Index = value;
+                    //EndOfString = false;
+                    Char = Text[value];
+                }
+                _firstNonSpace = null;
             }
-            else
-            {
-                _index = value;
-                EndOfString = false;
-                Char = Text[value];
-            }
-            _firstNonSpace = null;
         }
 
-        private int _length;
-        private int _index;
-        public int Index
-        {
-            get { return _index; }
-        }
-
-        public char Char;
-        public bool EndOfString;
 
         private int? _firstNonSpace;
         public int FirstNonSpace
@@ -63,7 +61,7 @@ namespace CommonMarkSharp
             {
                 if (_firstNonSpace == null)
                 {
-                    _firstNonSpace = _index + CountWhile(' ');
+                    _firstNonSpace = Index + this.CountWhile(' ');
                 }
                 return _firstNonSpace.Value;
             }
@@ -71,12 +69,12 @@ namespace CommonMarkSharp
 
         public char FirstNonSpaceChar { get { return GetChar(FirstNonSpace); } }
         public bool IsBlank { get { return FirstNonSpace == _length; } }
-        public int Indent { get { return FirstNonSpace - _index; } }
-        public string Rest { get { return EndOfString ? "" : Text.Substring(_index); } }
+        public int Indent { get { return FirstNonSpace - Index; } }
+        public string Rest { get { return EndOfString ? "" : Text.Substring(Index); } }
 
         public char this[int relativeIndex]
         {
-            get { return GetChar(_index + relativeIndex); }
+            get { return GetChar(Index + relativeIndex); }
         }
 
         private bool ValidIndex(int index)
@@ -94,46 +92,31 @@ namespace CommonMarkSharp
             return new SavedSubject(this);
         }
 
-        public int Advance(int count = 1)
+        public bool Advance()
         {
-            var originalIndex = _index;
-            SetIndex(_index + count);
-            return _index - originalIndex;
+            if (EndOfString)
+            {
+                return false;
+            }
+            SetIndex(Index + 1);
+            return true;
         }
 
-        public int AdvanceWhile(char c)
+        public int Advance(int count)
         {
-            return Advance(CountWhile(c));
+            if (count != 0)
+            {
+                var originalIndex = Index;
+                SetIndex(Index + count);
+                return Index - originalIndex;
+            }
+            return 0;
         }
 
-        public int AdvanceWhile(char c, int max)
-        {
-            return Advance(CountWhile(c, max));
-        }
-
-        public int AdvanceWhileNot(char c)
-        {
-            return Advance(CountWhileNot(c));
-        }
-
-        public int AdvanceWhileNot(char c, int max)
-        {
-            return Advance(CountWhileNot(c, max));
-        }
-
-        public int AdvanceWhile(Func<char, bool> predicate)
-        {
-            return Advance(CountWhile(predicate));
-        }
-
-        public int AdvanceWhile(Func<char, bool> predicate, int max)
-        {
-            return Advance(CountWhile(predicate, max));
-        }
 
         public void AdvanceToFirstNonSpace(int offset = 0)
         {
-            SetIndex(FirstNonSpace + offset);
+            SetIndex(Math.Min(FirstNonSpace + offset, _length));
         }
 
         public void AdvanceToEnd(int offset = 0)
@@ -141,129 +124,9 @@ namespace CommonMarkSharp
             SetIndex(_length + offset);
         }
 
-        public char Take()
-        {
-            if (EndOfString)
-            {
-                return char.MinValue;
-            }
-            var result = Char;
-            Advance();
-            return result;
-        }
-
-        public string Take(int count)
-        {
-            var result = Text.Substring(_index, count);
-            Advance(count);
-            return result;
-        }
-
-        public string TakeWhile(char c)
-        {
-            return Take(CountWhile(c));
-        }
-
-        public string TakeWhile(char c, int max)
-        {
-            return Take(CountWhile(c, max));
-        }
-
-        public string TakeWhileNot(char c)
-        {
-            return Take(CountWhileNot(c));
-        }
-
-        public string TakeWhileNot(char c, int max)
-        {
-            return Take(CountWhileNot(c, max));
-        }
-
-        public string TakeWhile(Func<char, bool> predicate)
-        {
-            return Take(CountWhile(predicate));
-        }
-
-        public string TakeWhile(Func<char, bool> predicate, int max)
-        {
-            return Take(CountWhile(predicate, max));
-        }
-
-        public int CountWhile(char c)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && Text[index] == c)
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
-        }
-
-        public int CountWhile(char c, int max)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && count < max && Text[index] == c)
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
-        }
-
-        public int CountWhileNot(char c)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && Text[index] != c)
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
-        }
-
-        public int CountWhileNot(char c, int max)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && count < max && Text[index] != c)
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
-        }
-
-        public int CountWhile(Func<char, bool> predicate)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && predicate(Text[index]))
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
-        }
-
-        public int CountWhile(Func<char, bool> predicate, int max)
-        {
-            var count = 0;
-            var index = _index;
-            while (index < _length && count < max && predicate(Text[index]))
-            {
-                index += 1;
-                count += 1;
-            }
-            return count;
-        }
-
         public bool Contains(char c, int relativeIndex = 0)
         {
-            var index = Math.Max(0, _index + relativeIndex);
+            var index = Math.Max(0, Index + relativeIndex);
             if (index >= _length)
             {
                 return false;
@@ -273,7 +136,7 @@ namespace CommonMarkSharp
 
         public bool Contains(string str, int relativeIndex = 0)
         {
-            var index = Math.Max(0, _index + relativeIndex);
+            var index = Math.Max(0, Index + relativeIndex);
             if (index >= _length)
             {
                 return false;
@@ -283,7 +146,7 @@ namespace CommonMarkSharp
 
         public bool StartsWith(string str, int relativeIndex = 0)
         {
-            var index = _index + relativeIndex;
+            var index = Index + relativeIndex;
             if (index + str.Length > _length)
             {
                 return false;
@@ -301,7 +164,7 @@ namespace CommonMarkSharp
 
         public bool PartOfSequence(char c, int count)
         {
-            var index = _index;
+            var index = Index;
             while (index > 0 && Text[index] == c)
             {
                 index -= 1;
@@ -317,7 +180,7 @@ namespace CommonMarkSharp
 
         public int SkipWhiteSpace()
         {
-            return AdvanceWhile(c => IsWhiteSpace(c));
+            return this.AdvanceWhile(c => IsWhiteSpace(c));
         }
 
         public static bool IsWhiteSpace(char c)
@@ -339,7 +202,7 @@ namespace CommonMarkSharp
 
         public override string ToString()
         {
-            return string.Format("{0}↑{1}", Escape(Text.Substring(0, _index)), Escape(Text.Substring(_index)));
+            return string.Format("{0}↑{1}", Escape(Text.Substring(0, Index)), Escape(Text.Substring(Index)));
         }
 
         public static string Escape(string input)
@@ -362,15 +225,25 @@ namespace CommonMarkSharp
             public SavedSubject(Subject subject)
             {
                 _subject = subject;
-                _index = _subject._index;
+                _index = _subject.Index;
+                _char = subject.Char;
+                _endOfString = subject.EndOfString;
             }
 
             private Subject _subject;
             private int _index;
+            private char _char;
+            private bool _endOfString;
 
             public void Restore()
             {
-                _subject.SetIndex(_index);
+                if (_index != _subject.Index)
+                {
+                    _subject.Index = _index;
+                    _subject.EndOfString = false;
+                    _subject.Char = _char;
+                    _subject._firstNonSpace = null;
+                }
             }
 
             public string GetLiteral()

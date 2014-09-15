@@ -1,4 +1,5 @@
 ﻿using CommonMarkSharp.Inlines;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,16 +21,22 @@ namespace CommonMarkSharp.InlineParsers
         {
             return SignificantChars.Any && SignificantChars.Contains(subject.Char);
         }
-        
+
         public InlineString Parse(ParserContext context, Subject subject)
         {
             if (SignificantChars.Any)
             {
-                var chars = subject.TakeWhile(c => SignificantChars.Contains(c), Max);
-                if (chars.Any())
+                var count = subject.CountWhile(SignificantChars, Max);
+                if (count > 0)
                 {
-                    return new InlineString(chars);
+                    return new InlineString(subject.Take(count));
                 }
+
+                //var chars = subject.TakeWhile(c => SignificantChars.Contains(c), Max);
+                //if (chars.Any())
+                //{
+                //    return new InlineString(chars);
+                //}
             }
             return null;
         }

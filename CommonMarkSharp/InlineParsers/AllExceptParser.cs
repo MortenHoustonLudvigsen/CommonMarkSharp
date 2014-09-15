@@ -1,4 +1,5 @@
 ﻿using CommonMarkSharp.Inlines;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,10 +10,12 @@ namespace CommonMarkSharp.InlineParsers
         public AllExceptParser(CharSet significantChars, int max = int.MaxValue)
         {
             SignificantChars = significantChars;
+            SignificantCharsX = significantChars.Chars.ToArray();
             Max = max;
         }
 
         public CharSet SignificantChars { get; private set; }
+        public char[] SignificantCharsX { get; private set; }
         public string StartsWithChars { get { return null; } }
         public int Max { get; private set; }
 
@@ -25,10 +28,10 @@ namespace CommonMarkSharp.InlineParsers
         {
             if (SignificantChars.Any)
             {
-                var chars = subject.TakeWhile(c => !SignificantChars.Contains(c), Max);
-                if (chars.Any())
+                var count = subject.CountWhileNot(SignificantChars, Max);
+                if (count > 0)
                 {
-                    return new InlineString(chars);
+                    return new InlineString(subject.Take(count));
                 }
             }
             return null;

@@ -6,14 +6,12 @@ namespace CommonMarkSharp.InlineParsers
     {
         public string StartsWithChars { get { return "\\ \n"; } }
 
-        public bool CanParse(Subject subject)
-        {
-            return subject.Char == '\\' || subject.Char == ' ' || subject.Char == '\n';
-        }
-
         public LineBreak Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return null;
+            if (subject.Char != '\\' && subject.Char != ' ' && subject.Char != '\n')
+            {
+                return null;
+            }
 
             var saved = subject.Save();
 

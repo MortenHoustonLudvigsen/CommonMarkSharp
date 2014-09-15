@@ -44,7 +44,7 @@ namespace CommonMarkSharp
         {
             Write("<pre>");
             Write("<code>");
-            Write(Escape(code.Contents));
+            WriteEscaped(code.Contents);
             Write("</code>");
             Write("</pre>");
             WriteLine();
@@ -57,10 +57,10 @@ namespace CommonMarkSharp
             Write("<code");
             if (!string.IsNullOrEmpty(language))
             {
-                WriteAttribute("class", Escape("language-" + language, true));
+                WriteAttribute("class", "language-" + language);
             }
             Write(">");
-            Write(Escape(code.Contents));
+            WriteEscaped(code.Contents);
             Write("</code>");
             Write("</pre>");
             WriteLine();
@@ -121,7 +121,7 @@ namespace CommonMarkSharp
 
         public virtual void Visit(InlineString inline)
         {
-            Write(Escape(inline.Value));
+            WriteEscaped(inline.Value);
         }
 
         public virtual void Visit(HardBreak inline)
@@ -146,9 +146,9 @@ namespace CommonMarkSharp
 
         public virtual void Visit(Emphasis inline)
         {
-            Write(EscapeInAttribute("<em>"));
+            WriteEscapedInAttribute("<em>");
             Write(inline.Inlines);
-            Write(EscapeInAttribute("</em>"));
+            WriteEscapedInAttribute("</em>");
         }
 
         public virtual void Visit(StrongEmphasis inline)
@@ -217,7 +217,9 @@ namespace CommonMarkSharp
 
         public virtual void Visit(InlineCode inline)
         {
-            Write("<code>{0}</code>", Escape(inline.Code));
+            Write("<code>");
+            WriteEscaped(inline.Code);
+            Write("</code>");
         }
 
         public virtual void Visit(RawHtml inline)

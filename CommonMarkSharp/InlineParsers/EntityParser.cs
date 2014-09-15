@@ -10,20 +10,16 @@ namespace CommonMarkSharp.InlineParsers
             get { return "&"; }
         }
 
-        public bool CanParse(Subject subject)
-        {
-            return subject.Char == '&';
-        }
-
         public Entity Parse(ParserContext context, Subject subject)
         {
-            if (!CanParse(subject)) return null;
+            if (subject.Char != '&')
+            {
+                return null;
+            }
 
             var saved = subject.Save();
             subject.Advance();
-
             var found = false;
-
             if (subject.Char == '#')
             {
                 subject.Advance();
@@ -41,13 +37,11 @@ namespace CommonMarkSharp.InlineParsers
             {
                 found = subject.AdvanceWhile(c => Patterns.Alphanums.Contains(c), 32) >= 2;
             }
-
             if (found && subject.Char == ';')
             {
                 subject.Advance();
                 return new Entity(saved.GetLiteral());
             }
-
             saved.Restore();
             return null;
         }

@@ -8,12 +8,12 @@ namespace CommonMarkSharp.BlockParsers
         {
             var saved = subject.Save();
 
-            var fenceOffset = subject.AdvanceWhile(c => c == ' ', 3);
+            var fenceOffset = subject.AdvanceWhile(' ', 3);
 
             if (subject.Char == '`' || subject.Char == '~')
             {
                 var fenceChar = subject.Char;
-                var fenceLength = subject.AdvanceWhile(c => c == fenceChar);
+                var fenceLength = subject.AdvanceWhile(fenceChar);
                 if (fenceLength >= 3 && !subject.Contains(fenceChar))
                 {
                     context.AddBlock(new FencedCode

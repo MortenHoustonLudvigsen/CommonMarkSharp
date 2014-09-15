@@ -17,26 +17,26 @@ namespace CommonMarkSharp.InlineParsers
             if (!CanParse(subject)) return null;
 
             var saved = subject.Save();
-            var openticks = subject.TakeWhile(c => c == '`').ToArray();
+            var openticks = subject.TakeWhile('`');
             var code = "";
             var codeEnded = false;
             while (!subject.EndOfString && !codeEnded)
             {
                 if (subject.Char == '`')
                 {
-                    var closeticks = subject.TakeWhile(c => c == '`').ToArray();
+                    var closeticks = subject.TakeWhile('`');
                     if (closeticks.Length == openticks.Length)
                     {
                         codeEnded = true;
                     }
                     else
                     {
-                        code += new string(closeticks);
+                        code += closeticks;
                     }
                 }
                 else
                 {
-                    code += new string(subject.TakeWhile(c => c != '`').ToArray());
+                    code += subject.TakeWhileNot('`');
                 }
             }
             if (codeEnded)

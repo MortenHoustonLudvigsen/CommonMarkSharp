@@ -78,7 +78,7 @@ namespace CommonMarkSharp.InlineParsers
 
             var saved = subject.Save();
             subject.Advance();
-            var scheme = subject.TakeWhile(c => c != ':');
+            var scheme = subject.TakeWhileNot(':');
 
             if (subject.Char == ':' && _schemes.Contains(scheme, StringComparer.InvariantCultureIgnoreCase))
             {

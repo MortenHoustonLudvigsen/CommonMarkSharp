@@ -24,7 +24,7 @@ namespace CommonMarkSharp.InlineParsers
 
             var saved = subject.Save();
 
-            subject.AdvanceWhile(c => c == ' ', 3);
+            subject.AdvanceWhile(' ', 3);
 
             if (subject.Char != '[')
             {

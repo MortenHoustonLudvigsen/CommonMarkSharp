@@ -21,7 +21,7 @@ namespace CommonMarkSharp.InlineParsers
 
             if (subject.Char == ' ')
             {
-                var count = subject.AdvanceWhile(c => c == ' ');
+                var count = subject.AdvanceWhile(' ');
                 if (subject.Char == '\n')
                 {
                     result = count >= 2 ? (LineBreak)new HardBreak() : new SoftBreak();

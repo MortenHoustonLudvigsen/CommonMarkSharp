@@ -29,7 +29,7 @@ namespace CommonMarkSharp.Blocks
         public override bool MatchNextLine(Subject subject)
         {
             // skip optional spaces of fence offset
-            subject.AdvanceWhile(c => c == ' ', Offset);
+            subject.AdvanceWhile(' ', Offset);
             return true;
         }
     }

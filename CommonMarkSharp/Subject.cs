@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace CommonMarkSharp
 {
@@ -10,40 +11,50 @@ namespace CommonMarkSharp
         {
             Text = text ?? "";
             _length = Text.Length;
-            Index = 0;
+            _firstNonSpace = null;
+            _index = 0;
+
+            if (_length == 0)
+            {
+                EndOfString = true;
+                Char = char.MinValue;
+            }
+            else
+            {
+                EndOfString = false;
+                Char = Text[0];
+            }
         }
 
-        public string Text { get; private set; }
+        public string Text;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetIndex(int value)
+        {
+            if (value >= _length)
+            {
+                _index = _length;
+                EndOfString = true;
+                Char = char.MinValue;
+            }
+            else
+            {
+                _index = value;
+                EndOfString = false;
+                Char = Text[value];
+            }
+            _firstNonSpace = null;
+        }
 
         private int _length;
         private int _index;
         public int Index
         {
             get { return _index; }
-            private set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentException("Index must not be less than 0");
-                }
-
-                if (value >= _length)
-                {
-                    _index = _length;
-                    EndOfString = true;
-                    Char = char.MinValue;
-                }
-                else
-                {
-                    _index = value;
-                    EndOfString = false;
-                    Char = Text[_index];
-                }
-                _firstNonSpace = null;
-            }
         }
 
-        public char Char { get; private set; }
+        public char Char;
+        public bool EndOfString;
 
         private int? _firstNonSpace;
         public int FirstNonSpace
@@ -52,7 +63,7 @@ namespace CommonMarkSharp
             {
                 if (_firstNonSpace == null)
                 {
-                    _firstNonSpace = _index + CountWhile(c => c == ' ');
+                    _firstNonSpace = _index + CountWhile(' ');
                 }
                 return _firstNonSpace.Value;
             }
@@ -61,7 +72,6 @@ namespace CommonMarkSharp
         public char FirstNonSpaceChar { get { return GetChar(FirstNonSpace); } }
         public bool IsBlank { get { return FirstNonSpace == _length; } }
         public int Indent { get { return FirstNonSpace - _index; } }
-        public bool EndOfString { get; private set; }
         public string Rest { get { return EndOfString ? "" : Text.Substring(_index); } }
 
         public char this[int relativeIndex]
@@ -87,8 +97,28 @@ namespace CommonMarkSharp
         public int Advance(int count = 1)
         {
             var originalIndex = _index;
-            Index = _index + count;
+            SetIndex(_index + count);
             return _index - originalIndex;
+        }
+
+        public int AdvanceWhile(char c)
+        {
+            return Advance(CountWhile(c));
+        }
+
+        public int AdvanceWhile(char c, int max)
+        {
+            return Advance(CountWhile(c, max));
+        }
+
+        public int AdvanceWhileNot(char c)
+        {
+            return Advance(CountWhileNot(c));
+        }
+
+        public int AdvanceWhileNot(char c, int max)
+        {
+            return Advance(CountWhileNot(c, max));
         }
 
         public int AdvanceWhile(Func<char, bool> predicate)
@@ -103,12 +133,12 @@ namespace CommonMarkSharp
 
         public void AdvanceToFirstNonSpace(int offset = 0)
         {
-            Index = FirstNonSpace + offset;
+            SetIndex(FirstNonSpace + offset);
         }
 
         public void AdvanceToEnd(int offset = 0)
         {
-            Index = _length + offset;
+            SetIndex(_length + offset);
         }
 
         public char Take()
@@ -129,6 +159,26 @@ namespace CommonMarkSharp
             return result;
         }
 
+        public string TakeWhile(char c)
+        {
+            return Take(CountWhile(c));
+        }
+
+        public string TakeWhile(char c, int max)
+        {
+            return Take(CountWhile(c, max));
+        }
+
+        public string TakeWhileNot(char c)
+        {
+            return Take(CountWhileNot(c));
+        }
+
+        public string TakeWhileNot(char c, int max)
+        {
+            return Take(CountWhileNot(c, max));
+        }
+
         public string TakeWhile(Func<char, bool> predicate)
         {
             return Take(CountWhile(predicate));
@@ -137,6 +187,54 @@ namespace CommonMarkSharp
         public string TakeWhile(Func<char, bool> predicate, int max)
         {
             return Take(CountWhile(predicate, max));
+        }
+
+        public int CountWhile(char c)
+        {
+            var count = 0;
+            var index = _index;
+            while (index < _length && Text[index] == c)
+            {
+                index += 1;
+                count += 1;
+            }
+            return count;
+        }
+
+        public int CountWhile(char c, int max)
+        {
+            var count = 0;
+            var index = _index;
+            while (index < _length && count < max && Text[index] == c)
+            {
+                index += 1;
+                count += 1;
+            }
+            return count;
+        }
+
+        public int CountWhileNot(char c)
+        {
+            var count = 0;
+            var index = _index;
+            while (index < _length && Text[index] != c)
+            {
+                index += 1;
+                count += 1;
+            }
+            return count;
+        }
+
+        public int CountWhileNot(char c, int max)
+        {
+            var count = 0;
+            var index = _index;
+            while (index < _length && count < max && Text[index] != c)
+            {
+                index += 1;
+                count += 1;
+            }
+            return count;
         }
 
         public int CountWhile(Func<char, bool> predicate)
@@ -237,8 +335,8 @@ namespace CommonMarkSharp
             return IsWhiteSpace(this[relativeIndex]);
         }
 
-        #if DEBUG
-        
+#if DEBUG
+
         public override string ToString()
         {
             return string.Format("{0}↑{1}", Escape(Text.Substring(0, _index)), Escape(Text.Substring(_index)));
@@ -257,37 +355,37 @@ namespace CommonMarkSharp
                 .Replace("\v", "\\v");
         }
 
-        #endif
+#endif
 
-        public class SavedSubject
+        public struct SavedSubject
         {
             public SavedSubject(Subject subject)
             {
-                Subject = subject;
-                Index = Subject._index;
+                _subject = subject;
+                _index = _subject._index;
             }
 
-            public Subject Subject { get; private set; }
-            public int Index { get; private set; }
+            private Subject _subject;
+            private int _index;
 
             public void Restore()
             {
-                Subject.Index = Index;
+                _subject.SetIndex(_index);
             }
 
             public string GetLiteral()
             {
-                return Subject.Text.Substring(Index, Subject.Index - Index);
+                return _subject.Text.Substring(_index, _subject.Index - _index);
             }
 
-            #if DEBUG
+#if DEBUG
 
             public override string ToString()
             {
-                return string.Format("{0}↑{1}↑{2}", Escape(Subject.Text.Substring(0, Index)), Escape(Subject.Text.Substring(Index, Subject.Index - Index)), Escape(Subject.Text.Substring(Subject.Index)));
+                return string.Format("{0}↑{1}↑{2}", Escape(_subject.Text.Substring(0, _index)), Escape(_subject.Text.Substring(_index, _subject.Index - _index)), Escape(_subject.Text.Substring(_subject.Index)));
             }
 
-            #endif
+#endif
         }
     }
 }

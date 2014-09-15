@@ -9,9 +9,9 @@ namespace CommonMarkSharp.BlockParsers
         {
             var saved = subject.Save();
 
-            subject.AdvanceWhile(c => c == ' ', 3);
+            subject.AdvanceWhile(' ', 3);
 
-            var level = subject.AdvanceWhile(c => c == '#');
+            var level = subject.AdvanceWhile('#');
             var contents = new StringBuilder();
 
             if (level >= 1 && level <= 6 && (subject.Char == ' ' || subject.EndOfString))
@@ -29,8 +29,8 @@ namespace CommonMarkSharp.BlockParsers
                     }
                     else if (subject.Char == '#')
                     {
-                        var closingSequence = subject.TakeWhile(c => c == '#');
-                        var closingSpace = subject.TakeWhile(c => c == ' ');
+                        var closingSequence = subject.TakeWhile('#');
+                        var closingSpace = subject.TakeWhile(' ');
                         if (!subject.EndOfString)
                         {
                             contents.Append(closingSequence);
@@ -40,7 +40,7 @@ namespace CommonMarkSharp.BlockParsers
                     else
                     {
                         contents.Append(subject.TakeWhile(c => c != '#' && c != '\\' && c != ' '));
-                        var closingSpace = subject.TakeWhile(c => c == ' ');
+                        var closingSpace = subject.TakeWhile(' ');
                         if (!subject.EndOfString)
                         {
                             contents.Append(closingSpace);

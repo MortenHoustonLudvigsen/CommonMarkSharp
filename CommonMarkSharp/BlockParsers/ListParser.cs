@@ -9,7 +9,7 @@ namespace CommonMarkSharp.BlockParsers
         {
             var saved = subject.Save();
 
-            var indent = subject.AdvanceWhile(c => c == ' ', 3);
+            var indent = subject.AdvanceWhile(' ', 3);
             var ok = false;
             var spacesAfterMarker = 0;
             var data = new ListData();
@@ -34,7 +34,7 @@ namespace CommonMarkSharp.BlockParsers
                 }
             }
 
-            spacesAfterMarker = subject.AdvanceWhile(c => c == ' ');
+            spacesAfterMarker = subject.AdvanceWhile(' ');
 
             if (!ok || spacesAfterMarker == 0 && !subject.EndOfString)
             {

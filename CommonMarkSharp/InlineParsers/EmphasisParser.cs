@@ -88,12 +88,12 @@ namespace CommonMarkSharp.InlineParsers
             }
 
             saved.Restore();
-            return new InlineString(subject.TakeWhile(c => c == emphChar));
+            return new InlineString(subject.TakeWhile(emphChar));
         }
 
         private bool CanOpen(Subject subject, char emphChar, out int count)
         {
-            count = subject.CountWhile(c => c == emphChar);
+            count = subject.CountWhile(emphChar);
 
             if (subject.Char != emphChar)
             {
@@ -120,7 +120,7 @@ namespace CommonMarkSharp.InlineParsers
 
         private bool CanClose(Subject subject, char emphChar, int startCount, out int count)
         {
-            count = subject.CountWhile(c => { return c == emphChar; });
+            count = subject.CountWhile(emphChar);
 
             if (subject.Char != emphChar)
             {

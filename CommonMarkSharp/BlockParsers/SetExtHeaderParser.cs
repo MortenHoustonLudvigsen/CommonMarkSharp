@@ -12,14 +12,14 @@ namespace CommonMarkSharp.BlockParsers
 
             var saved = subject.Save();
 
-            subject.AdvanceWhile(c => c == ' ', 3);
+            subject.AdvanceWhile(' ', 3);
 
             if (subject.Char == '-' || subject.Char == '=')
             {
                 var headerChar = subject.Char;
                 var level = headerChar == '=' ? 1 : 2;
 
-                subject.AdvanceWhile(c => c == headerChar);
+                subject.AdvanceWhile(headerChar);
                 subject.SkipWhiteSpace();
                 if (subject.EndOfString)
                 {

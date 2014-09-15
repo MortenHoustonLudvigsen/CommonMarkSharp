@@ -8,16 +8,16 @@ namespace CommonMarkSharp.BlockParsers
         {
             var saved = subject.Save();
 
-            subject.AdvanceWhile(c => c == ' ', 3);
+            subject.AdvanceWhile(' ', 3);
 
             if (subject.Char == '-' || subject.Char == '_' || subject.Char == '*')
             {
                 var hRuleChar = subject.Char;
-                var length = subject.AdvanceWhile(c => c == hRuleChar);
+                var length = subject.AdvanceWhile(hRuleChar);
                 subject.SkipWhiteSpace();
                 while (subject.Char == hRuleChar)
                 {
-                    length += subject.AdvanceWhile(c => c == hRuleChar);
+                    length += subject.AdvanceWhile(hRuleChar);
                     subject.SkipWhiteSpace();
                 }
                 if (length >= 3)

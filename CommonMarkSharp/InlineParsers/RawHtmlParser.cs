@@ -110,7 +110,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
                 else
                 {
-                    finished = subject.AdvanceWhile(c => c != '-') == 0;
+                    finished = subject.AdvanceWhileNot('-') == 0;
                 }
             } while (!finished);
 
@@ -171,7 +171,7 @@ namespace CommonMarkSharp.InlineParsers
             if (subject.AdvanceWhile(c => _declarationChars.Contains(c)) > 0)
             {
                 subject.SkipWhiteSpace();
-                subject.AdvanceWhile(c => c != '>');
+                subject.AdvanceWhileNot('>');
 
                 if (subject.Char == '>')
                 {
@@ -207,7 +207,7 @@ namespace CommonMarkSharp.InlineParsers
                 }
                 else
                 {
-                    finished = subject.AdvanceWhile(c => c != ']') == 0;
+                    finished = subject.AdvanceWhileNot(']') == 0;
                 }
             } while (!finished);
 
@@ -290,7 +290,7 @@ namespace CommonMarkSharp.InlineParsers
             }
             var saved = subject.Save();
             subject.Advance();
-            subject.AdvanceWhile(c => c != '\'');
+            subject.AdvanceWhileNot('\'');
             if (subject.Char == '\'')
             {
                 subject.Advance();
@@ -309,7 +309,7 @@ namespace CommonMarkSharp.InlineParsers
             }
             var saved = subject.Save();
             subject.Advance();
-            subject.AdvanceWhile(c => c != '"');
+            subject.AdvanceWhileNot('"');
             if (subject.Char == '"')
             {
                 subject.Advance();

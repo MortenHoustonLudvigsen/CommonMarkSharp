@@ -30,5 +30,24 @@ namespace CommonMarkSharp.Tests
             Helpers.LogValue("Actual", actual);
             Assert.AreEqual(Helpers.Tidy(expected), Helpers.Tidy(actual));
         }
+
+        [TestMethod]
+        [TestCategory("Inlines - Emphasis and strong emphasis")]
+        public void UnderscoreWithinEmphasis2()
+        {
+            // See https://github.com/jgm/stmd/issues/51 for additional info
+            // The rule is that inlines are processed left-to-right
+
+            // Arrange
+            var commonMark = Helpers.Normalize("*a _b _c d_ e*");
+            var expected = Helpers.Normalize("<p><em>a <em>b _c d</em> e</em></p>");
+
+            // Act
+            var actual = _cm.RenderAsHtml(commonMark);
+
+            // Assert
+            Helpers.LogValue("Actual", actual);
+            Assert.AreEqual(Helpers.Tidy(expected), Helpers.Tidy(actual));
+        }
     }
 }

@@ -2,7 +2,7 @@
 <package >
     <metadata>
         <id>$id$</id>
-        <version>0.3.0</version>
+        <version>0.3.1</version>
         <title>$title$</title>
         <authors>$author$</authors>
         <owners>$author$</owners>
@@ -11,7 +11,7 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>$description$</description>
         <releaseNotes>
-            TextRenderer can now render any Part or IEnumerable&lt;Part&gt;
+            Tag writing should now be extensible
         </releaseNotes>
         <copyright>Copyright © 2014 Morten Houston Ludvigsen, All Rights Reserved</copyright>
         <tags>CommonMark Markdown</tags>

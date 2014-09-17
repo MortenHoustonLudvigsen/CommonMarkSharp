@@ -2,7 +2,7 @@
 <package >
     <metadata>
         <id>$id$</id>
-        <version>0.3.1</version>
+        <version>0.3.2</version>
         <title>$title$</title>
         <authors>$author$</authors>
         <owners>$author$</owners>
@@ -11,7 +11,7 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>$description$</description>
         <releaseNotes>
-            Tag writing should now be extensible
+            Tag writing should now be more extensible
         </releaseNotes>
         <copyright>Copyright © 2014 Morten Houston Ludvigsen, All Rights Reserved</copyright>
         <tags>CommonMark Markdown</tags>

@@ -116,14 +116,16 @@ public class HtmlPageRenderer : HtmlRenderer
 {
     public override void Visit(Document document)
     {
-        WriteLine("<html>");
-        WriteLine("<head>");
-        WriteLine("<title>A title</title>");
-        WriteLine("</head>");
-        WriteLine("<body>");
+        WriteStartTag(document, "html");
+        WriteStartTag(document, "head");
+        WriteStartTag(document, "title");
+        Write("A title");
+        WriteEndTag(document, "title");
+        WriteEndTag("head");
+        WriteStartTag(WriteEndTag, "body");
         base.Visit(document);
-        WriteLine("</body>");
-        WriteLine("</html>");
+        WriteEndTag(document, "body");
+        WriteEndTag(document, "html");
     }
 }
 ```

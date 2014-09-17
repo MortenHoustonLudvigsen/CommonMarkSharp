@@ -46,7 +46,7 @@ namespace CommonMarkSharp
 
         protected bool InAttribute { get; set; }
 
-        protected virtual void WriteAttribute<T>(string attribute, T value, bool includeEmptyAttribute, Func<T, bool> shouldWriteAttribute, Action<T> writeValue)
+        protected virtual void WriteAttribute<T>(Part part, string attribute, T value, bool includeEmptyAttribute, Func<T, bool> shouldWriteAttribute, Action<T> writeValue)
             where T : class
         {
             if (includeEmptyAttribute || shouldWriteAttribute(value))
@@ -62,73 +62,60 @@ namespace CommonMarkSharp
             }
         }
 
-        //protected virtual void WriteAttribute(string attribute, string value, bool includeEmptyAttribute = false)
-        //{
-        //    WriteAttribute(attribute, value, includeEmptyAttribute, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
-        //}
-
-        //protected virtual void WriteAttribute(string attribute, Part part, bool includeEmptyAttribute = false)
-        //{
-        //    WriteAttribute(attribute, part, includeEmptyAttribute, p => p != null, p => p.Accept(this));
-        //}
-
-        //protected virtual void WriteAttribute(string attribute, IEnumerable<Part> parts, bool includeEmptyAttribute = false)
-        //{
-        //    WriteAttribute(attribute, parts, includeEmptyAttribute, p => p != null && p.Any(), p => p.Accept(this));
-        //}
-
-        protected virtual void WriteAttribute(Attribute attribute)
+        protected virtual void WriteAttribute(Part part, Attribute attribute)
         {
             switch (attribute.ValueType)
             {
                 case Attribute.AttributeValueType.String:
-                    WriteAttribute(attribute.Name, attribute.Value as string, attribute.WriteIfEmpty, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
+                    WriteAttribute(part, attribute.Name, attribute.Value as string, attribute.WriteIfEmpty, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
                     break;
                 case Attribute.AttributeValueType.Part:
-                    WriteAttribute(attribute.Name, attribute.Value as Part, attribute.WriteIfEmpty, p => p != null, p => p.Accept(this));
+                    WriteAttribute(part, attribute.Name, attribute.Value as Part, attribute.WriteIfEmpty, p => p != null, p => p.Accept(this));
                     break;
                 case Attribute.AttributeValueType.PartList:
-                    WriteAttribute(attribute.Name, attribute.Value as IEnumerable<Part>, attribute.WriteIfEmpty, p => p != null && p.Any(), p => p.Accept(this));
+                    WriteAttribute(part, attribute.Name, attribute.Value as IEnumerable<Part>, attribute.WriteIfEmpty, p => p != null && p.Any(), p => p.Accept(this));
                     break;
             }
         }
 
-        protected void WriteStartTag(string tag, params Attribute[] attributes)
+        protected virtual void WriteAttributes(Part part, List<Attribute> attributes)
         {
-            WriteStartTag(tag, attributes.ToList());
+            foreach (var attribute in attributes)
+            {
+                WriteAttribute(part, attribute);
+            }
         }
 
-        protected virtual void WriteStartTag(string tag, List<Attribute> attributes)
+        protected void WriteStartTag(Part part, string tag, params Attribute[] attributes)
+        {
+            WriteStartTag(part, tag, attributes.ToList());
+        }
+
+        protected virtual void WriteStartTag(Part part, string tag, List<Attribute> attributes)
         {
             WriteEscapedInAttribute("<");
             WriteEscapedInAttribute(tag);
-            foreach (var attribute in attributes)
-            {
-                WriteAttribute(attribute);
-            }
+            WriteAttributes(part, attributes);
             WriteEscapedInAttribute(">");
         }
 
-        protected virtual void WriteEndTag(string tag)
+        protected virtual void WriteEndTag(Part part, string tag)
         {
             WriteEscapedInAttribute("</");
             WriteEscapedInAttribute(tag);
             WriteEscapedInAttribute(">");
         }
 
-        protected void WriteClosedTag(string tag, params Attribute[] attributes)
+        protected void WriteClosedTag(Part part, string tag, params Attribute[] attributes)
         {
-            WriteClosedTag(tag, attributes.ToList());
+            WriteClosedTag(part, tag, attributes.ToList());
         }
 
-        protected virtual void WriteClosedTag(string tag, List<Attribute> attributes)
+        protected virtual void WriteClosedTag(Part part, string tag, List<Attribute> attributes)
         {
             WriteEscapedInAttribute("<");
             WriteEscapedInAttribute(tag);
-            foreach (var attribute in attributes)
-            {
-                WriteAttribute(attribute);
-            }
+            WriteAttributes(part, attributes);
             WriteEscapedInAttribute(" />");
         }
 

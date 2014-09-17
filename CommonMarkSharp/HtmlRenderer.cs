@@ -14,43 +14,43 @@ namespace CommonMarkSharp
 
         public virtual void Visit(HorizontalRule horizontalRule)
         {
-            WriteClosedTag("hr");
+            WriteClosedTag(horizontalRule, "hr");
             WriteLine();
         }
 
         public virtual void Visit(Header header)
         {
             var tag = string.Format("h{0}", header.Level);
-            WriteStartTag(tag);
+            WriteStartTag(header, tag);
             Write(header.Inlines);
-            WriteEndTag(tag);
+            WriteEndTag(header, tag);
             WriteLine();
         }
 
         public virtual void Visit(Paragraph paragraph)
         {
-            WriteStartTag("p");
+            WriteStartTag(paragraph, "p");
             Write(paragraph.Inlines);
-            WriteEndTag("p");
+            WriteEndTag(paragraph, "p");
             WriteLine();
         }
 
         public virtual void Visit(BlockQuote quote)
         {
-            WriteStartTag("blockquote");
+            WriteStartTag(quote, "blockquote");
             WriteLine(true);
             Write(quote.Children);
-            WriteEndTag("blockquote");
+            WriteEndTag(quote, "blockquote");
             WriteLine();
         }
 
         public virtual void Visit(IndentedCode code)
         {
-            WriteStartTag("pre");
-            WriteStartTag("code");
+            WriteStartTag(code, "pre");
+            WriteStartTag(code, "code");
             WriteEscaped(code.Contents);
-            WriteEndTag("code");
-            WriteEndTag("pre");
+            WriteEndTag(code, "code");
+            WriteEndTag(code, "pre");
             WriteLine();
         }
 
@@ -62,11 +62,11 @@ namespace CommonMarkSharp
             {
                 attributes.Add(new Attribute("class", "language-" + language));
             }
-            WriteStartTag("pre");
-            WriteStartTag("code", attributes);
+            WriteStartTag(code, "pre");
+            WriteStartTag(code, "code", attributes);
             WriteEscaped(code.Contents);
-            WriteEndTag("code");
-            WriteEndTag("pre");
+            WriteEndTag(code, "code");
+            WriteEndTag(code, "pre");
             WriteLine();
         }
 
@@ -81,9 +81,9 @@ namespace CommonMarkSharp
             {
                 attributes.Add(new Attribute("start", list.Data.Start.ToString()));
             }
-            WriteStartTag(tag, attributes);
+            WriteStartTag(list, tag, attributes);
             Write(list.Children);
-            WriteEndTag(tag);
+            WriteEndTag(list, tag);
             if (!(list.Parent is ListItem))
             {
                 WriteLine();
@@ -96,7 +96,7 @@ namespace CommonMarkSharp
             var inTightList = _inTightList.Peek();
             var tag = item.Data.Type == "Bullet" ? "ul" : "ol";
             WriteLine();
-            WriteStartTag("li");
+            WriteStartTag(item, "li");
             foreach (var part in item.Children)
             {
                 var isLast = part == item.LastChild;
@@ -114,7 +114,7 @@ namespace CommonMarkSharp
                     WriteLine();
                 }
             }
-            WriteEndTag("li");
+            WriteEndTag(item, "li");
             WriteLine();
         }
 
@@ -131,7 +131,7 @@ namespace CommonMarkSharp
 
         public virtual void Visit(HardBreak inline)
         {
-            WriteClosedTag("br");
+            WriteClosedTag(inline, "br");
             WriteLine();
         }
 
@@ -152,29 +152,26 @@ namespace CommonMarkSharp
 
         public virtual void Visit(Emphasis inline)
         {
-            //WriteEscapedInAttribute("<em>");
-            //Write(inline.Inlines);
-            //WriteEscapedInAttribute("</em>");
-            WriteStartTag("em");
+            WriteStartTag(inline, "em");
             Write(inline.Inlines);
-            WriteEndTag("em");
+            WriteEndTag(inline, "em");
         }
 
         public virtual void Visit(StrongEmphasis inline)
         {
-            WriteStartTag("strong");
+            WriteStartTag(inline, "strong");
             Write(inline.Inlines);
-            WriteEndTag("strong");
+            WriteEndTag(inline, "strong");
         }
 
         public virtual void Visit(Link inline)
         {
-            WriteStartTag("a",
+            WriteStartTag(inline, "a",
                 new Attribute("href", inline.Destination.Inlines, true),
                 new Attribute("title", inline.Title.Inlines)
             );
             Write(inline.Label.Inlines);
-            WriteEndTag("a");
+            WriteEndTag(inline, "a");
         }
 
         public virtual void Visit(LinkLabel inline)
@@ -185,17 +182,17 @@ namespace CommonMarkSharp
         public virtual void Visit(LinkReference inline)
         {
             var label = inline.Label == null ? inline.Link.Label : inline.Label;
-            WriteStartTag("a",
+            WriteStartTag(inline, "a",
                 new Attribute("href", inline.Link.Destination.Inlines, true),
                 new Attribute("title", inline.Link.Title.Inlines)
             );
             Write(label.Inlines);
-            WriteEndTag("a");
+            WriteEndTag(inline, "a");
         }
 
         public virtual void Visit(Image inline)
         {
-            WriteClosedTag("img",
+            WriteClosedTag(inline, "img",
                 new Attribute("src", inline.Link.Destination.Inlines, true),
                 new Attribute("alt", inline.Link.Label.Inlines, true),
                 new Attribute("title", inline.Link.Title.Inlines)
@@ -205,7 +202,7 @@ namespace CommonMarkSharp
         public virtual void Visit(ImageReference inline)
         {
             var label = inline.LinkReference.Label == null ? inline.LinkReference.Link.Label : inline.LinkReference.Label;
-            WriteClosedTag("img",
+            WriteClosedTag(inline, "img",
                 new Attribute("src", inline.LinkReference.Link.Destination.Inlines, true),
                 new Attribute("alt", label.Inlines, true),
                 new Attribute("title", inline.LinkReference.Link.Title.Inlines)
@@ -214,9 +211,9 @@ namespace CommonMarkSharp
 
         public virtual void Visit(InlineCode inline)
         {
-            WriteStartTag("code");
+            WriteStartTag(inline, "code");
             WriteEscaped(inline.Code);
-            WriteEndTag("code");
+            WriteEndTag(inline, "code");
         }
 
         public virtual void Visit(RawHtml inline)

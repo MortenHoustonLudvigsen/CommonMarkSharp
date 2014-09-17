@@ -8,17 +8,32 @@ namespace CommonMarkSharp
     {
         private TextWriter _writer;
 
-        public void Render(Document document, TextWriter writer)
+        public void Render(Part part, TextWriter writer)
         {
             _writer = writer;
-            document.Accept(this);
+            part.Accept(this);
         }
 
-        public string Render(Document document)
+        public string Render(Part part)
         {
             using (var writer = new StringWriter())
             {
-                Render(document, writer);
+                Render(part, writer);
+                return writer.ToString();
+            }
+        }
+
+        public void Render(IEnumerable<Part> parts, TextWriter writer)
+        {
+            _writer = writer;
+            parts.Accept(this);
+        }
+
+        public string Render(IEnumerable<Part> parts)
+        {
+            using (var writer = new StringWriter())
+            {
+                Render(parts, writer);
                 return writer.ToString();
             }
         }

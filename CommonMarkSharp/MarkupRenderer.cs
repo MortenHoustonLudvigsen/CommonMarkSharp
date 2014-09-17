@@ -6,6 +6,44 @@ namespace CommonMarkSharp
 {
     public abstract class MarkupRenderer : TextRenderer
     {
+        public class Attribute
+        {
+            public enum AttributeValueType
+            {
+                String,
+                Part,
+                PartList
+            }
+
+            private Attribute(string name, object value, AttributeValueType valueType, bool writeIfEmpty)
+            {
+                Name = name;
+                Value = value;
+                ValueType = valueType;
+                WriteIfEmpty = writeIfEmpty;
+            }
+
+            public Attribute(string name, string value, bool writeIfEmpty = false)
+                : this(name, value, AttributeValueType.String, writeIfEmpty)
+            {
+            }
+
+            public Attribute(string name, Part value, bool writeIfEmpty = false)
+                : this(name, value, AttributeValueType.Part, writeIfEmpty)
+            {
+            }
+
+            public Attribute(string name, IEnumerable<Part> value, bool writeIfEmpty = false)
+                : this(name, value, AttributeValueType.PartList, writeIfEmpty)
+            {
+            }
+
+            public string Name { get; private set; }
+            public object Value { get; private set; }
+            public AttributeValueType ValueType { get; private set; }
+            public bool WriteIfEmpty { get; set; }
+        }
+
         protected bool InAttribute { get; set; }
 
         protected virtual void WriteAttribute<T>(string attribute, T value, bool includeEmptyAttribute, Func<T, bool> shouldWriteAttribute, Action<T> writeValue)
@@ -24,19 +62,74 @@ namespace CommonMarkSharp
             }
         }
 
-        protected virtual void WriteAttribute(string attribute, string value, bool includeEmptyAttribute = false)
+        //protected virtual void WriteAttribute(string attribute, string value, bool includeEmptyAttribute = false)
+        //{
+        //    WriteAttribute(attribute, value, includeEmptyAttribute, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
+        //}
+
+        //protected virtual void WriteAttribute(string attribute, Part part, bool includeEmptyAttribute = false)
+        //{
+        //    WriteAttribute(attribute, part, includeEmptyAttribute, p => p != null, p => p.Accept(this));
+        //}
+
+        //protected virtual void WriteAttribute(string attribute, IEnumerable<Part> parts, bool includeEmptyAttribute = false)
+        //{
+        //    WriteAttribute(attribute, parts, includeEmptyAttribute, p => p != null && p.Any(), p => p.Accept(this));
+        //}
+
+        protected virtual void WriteAttribute(Attribute attribute)
         {
-            WriteAttribute(attribute, value, includeEmptyAttribute, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
+            switch (attribute.ValueType)
+            {
+                case Attribute.AttributeValueType.String:
+                    WriteAttribute(attribute.Name, attribute.Value as string, attribute.WriteIfEmpty, v => !string.IsNullOrEmpty(v), v => WriteEscaped(v, true));
+                    break;
+                case Attribute.AttributeValueType.Part:
+                    WriteAttribute(attribute.Name, attribute.Value as Part, attribute.WriteIfEmpty, p => p != null, p => p.Accept(this));
+                    break;
+                case Attribute.AttributeValueType.PartList:
+                    WriteAttribute(attribute.Name, attribute.Value as IEnumerable<Part>, attribute.WriteIfEmpty, p => p != null && p.Any(), p => p.Accept(this));
+                    break;
+            }
         }
 
-        protected virtual void WriteAttribute(string attribute, Part part, bool includeEmptyAttribute = false)
+        protected void WriteStartTag(string tag, params Attribute[] attributes)
         {
-            WriteAttribute(attribute, part, includeEmptyAttribute, p => p != null, p => p.Accept(this));
+            WriteStartTag(tag, attributes.ToList());
         }
 
-        protected virtual void WriteAttribute(string attribute, IEnumerable<Part> parts, bool includeEmptyAttribute = false)
+        protected virtual void WriteStartTag(string tag, List<Attribute> attributes)
         {
-            WriteAttribute(attribute, parts, includeEmptyAttribute, p => p != null && p.Any(), p => p.Accept(this));
+            WriteEscapedInAttribute("<");
+            WriteEscapedInAttribute(tag);
+            foreach (var attribute in attributes)
+            {
+                WriteAttribute(attribute);
+            }
+            WriteEscapedInAttribute(">");
+        }
+
+        protected virtual void WriteEndTag(string tag)
+        {
+            WriteEscapedInAttribute("</");
+            WriteEscapedInAttribute(tag);
+            WriteEscapedInAttribute(">");
+        }
+
+        protected void WriteClosedTag(string tag, params Attribute[] attributes)
+        {
+            WriteClosedTag(tag, attributes.ToList());
+        }
+
+        protected virtual void WriteClosedTag(string tag, List<Attribute> attributes)
+        {
+            WriteEscapedInAttribute("<");
+            WriteEscapedInAttribute(tag);
+            foreach (var attribute in attributes)
+            {
+                WriteAttribute(attribute);
+            }
+            WriteEscapedInAttribute(" />");
         }
 
         protected virtual void WriteEscaped(string str, bool preserveEntities = false)
@@ -80,7 +173,7 @@ namespace CommonMarkSharp
             }
         }
 
-        protected virtual void WriteEscapedInAttribute(string str, bool preserveEntities = false)
+        protected virtual void WriteEscapedInAttribute(string str)
         {
             if (InAttribute)
             {
@@ -91,22 +184,5 @@ namespace CommonMarkSharp
                 Write(str);
             }
         }
-
-        //protected virtual string Escape(string str, bool preserveEntities = false)
-        //{
-        //    if (!preserveEntities)
-        //    {
-        //        str = str.Replace("&", "&amp;");
-        //    }
-        //    str = str.Replace("<", "&lt;");
-        //    str = str.Replace(">", "&gt;");
-        //    str = str.Replace("\"", "&quot;");
-        //    return str;
-        //}
-
-        //protected virtual string EscapeInAttribute(string str)
-        //{
-        //    return InAttribute ? Escape(str) : str;
-        //}
     }
 }

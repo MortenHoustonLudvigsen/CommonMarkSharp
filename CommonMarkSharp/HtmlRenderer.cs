@@ -14,55 +14,59 @@ namespace CommonMarkSharp
 
         public virtual void Visit(HorizontalRule horizontalRule)
         {
-            WriteLine("<hr />");
+            WriteClosedTag("hr");
+            WriteLine();
         }
 
         public virtual void Visit(Header header)
         {
-            Write("<h{0}>", header.Level);
+            var tag = string.Format("h{0}", header.Level);
+            WriteStartTag(tag);
             Write(header.Inlines);
-            Write("</h{0}>", header.Level);
+            WriteEndTag(tag);
             WriteLine();
         }
 
         public virtual void Visit(Paragraph paragraph)
         {
-            Write("<p>");
+            WriteStartTag("p");
             Write(paragraph.Inlines);
-            WriteLine("</p>");
+            WriteEndTag("p");
+            WriteLine();
         }
 
         public virtual void Visit(BlockQuote quote)
         {
-            Write("<blockquote>");
+            WriteStartTag("blockquote");
             WriteLine(true);
             Write(quote.Children);
-            WriteLine("</blockquote>");
+            WriteEndTag("blockquote");
+            WriteLine();
         }
 
         public virtual void Visit(IndentedCode code)
         {
-            Write("<pre>");
-            Write("<code>");
+            WriteStartTag("pre");
+            WriteStartTag("code");
             WriteEscaped(code.Contents);
-            Write("</code>");
-            Write("</pre>");
+            WriteEndTag("code");
+            WriteEndTag("pre");
             WriteLine();
         }
 
         public virtual void Visit(FencedCode code)
         {
             var language = code.InfoWords.FirstOrDefault();
-            Write("<pre>");
-            Write("<code");
+            var attributes = new List<Attribute>();
             if (!string.IsNullOrEmpty(language))
             {
-                WriteAttribute("class", "language-" + language);
+                attributes.Add(new Attribute("class", "language-" + language));
             }
-            Write(">");
+            WriteStartTag("pre");
+            WriteStartTag("code", attributes);
             WriteEscaped(code.Contents);
-            Write("</code>");
-            Write("</pre>");
+            WriteEndTag("code");
+            WriteEndTag("pre");
             WriteLine();
         }
 
@@ -72,14 +76,14 @@ namespace CommonMarkSharp
         {
             _inTightList.Push(list.Tight);
             var tag = list.Data.Type == "Bullet" ? "ul" : "ol";
-            Write("<{0}", tag);
+            var attributes = new List<Attribute>();
             if (list.Data.Start != null && list.Data.Start != 1)
             {
-                WriteAttribute("start", list.Data.Start.ToString());
+                attributes.Add(new Attribute("start", list.Data.Start.ToString()));
             }
-            WriteLine(">");
+            WriteStartTag(tag, attributes);
             Write(list.Children);
-            Write("</{0}>", tag);
+            WriteEndTag(tag);
             if (!(list.Parent is ListItem))
             {
                 WriteLine();
@@ -92,7 +96,7 @@ namespace CommonMarkSharp
             var inTightList = _inTightList.Peek();
             var tag = item.Data.Type == "Bullet" ? "ul" : "ol";
             WriteLine();
-            Write("<li>");
+            WriteStartTag("li");
             foreach (var part in item.Children)
             {
                 var isLast = part == item.LastChild;
@@ -110,7 +114,8 @@ namespace CommonMarkSharp
                     WriteLine();
                 }
             }
-            WriteLine("</li>");
+            WriteEndTag("li");
+            WriteLine();
         }
 
         public virtual void Visit(HtmlBlock html)
@@ -126,7 +131,8 @@ namespace CommonMarkSharp
 
         public virtual void Visit(HardBreak inline)
         {
-            WriteLine("<br />");
+            WriteClosedTag("br");
+            WriteLine();
         }
 
         public virtual void Visit(SoftBreak inline)
@@ -146,26 +152,29 @@ namespace CommonMarkSharp
 
         public virtual void Visit(Emphasis inline)
         {
-            WriteEscapedInAttribute("<em>");
+            //WriteEscapedInAttribute("<em>");
+            //Write(inline.Inlines);
+            //WriteEscapedInAttribute("</em>");
+            WriteStartTag("em");
             Write(inline.Inlines);
-            WriteEscapedInAttribute("</em>");
+            WriteEndTag("em");
         }
 
         public virtual void Visit(StrongEmphasis inline)
         {
-            Write("<strong>");
+            WriteStartTag("strong");
             Write(inline.Inlines);
-            Write("</strong>");
+            WriteEndTag("strong");
         }
 
         public virtual void Visit(Link inline)
         {
-            Write("<a");
-            WriteAttribute("href", inline.Destination.Inlines, true);
-            WriteAttribute("title", inline.Title.Inlines);
-            Write(">");
+            WriteStartTag("a",
+                new Attribute("href", inline.Destination.Inlines, true),
+                new Attribute("title", inline.Title.Inlines)
+            );
             Write(inline.Label.Inlines);
-            Write("</a>");
+            WriteEndTag("a");
         }
 
         public virtual void Visit(LinkLabel inline)
@@ -175,51 +184,39 @@ namespace CommonMarkSharp
 
         public virtual void Visit(LinkReference inline)
         {
-            Write("<a");
-            WriteAttribute("href", inline.Link.Destination.Inlines, true);
-            WriteAttribute("title", inline.Link.Title.Inlines);
-            Write(">");
-            if (inline.Label == null)
-            {
-                Write(inline.Link.Label.Inlines);
-            }
-            else
-            {
-                Write(inline.Label.Inlines);
-            }
-            Write("</a>");
+            var label = inline.Label == null ? inline.Link.Label : inline.Label;
+            WriteStartTag("a",
+                new Attribute("href", inline.Link.Destination.Inlines, true),
+                new Attribute("title", inline.Link.Title.Inlines)
+            );
+            Write(label.Inlines);
+            WriteEndTag("a");
         }
 
         public virtual void Visit(Image inline)
         {
-            Write("<img");
-            WriteAttribute("src", inline.Link.Destination.Inlines, true);
-            WriteAttribute("alt", inline.Link.Label.Inlines, true);
-            WriteAttribute("title", inline.Link.Title.Inlines);
-            Write(" />");
+            WriteClosedTag("img",
+                new Attribute("src", inline.Link.Destination.Inlines, true),
+                new Attribute("alt", inline.Link.Label.Inlines, true),
+                new Attribute("title", inline.Link.Title.Inlines)
+            );
         }
 
         public virtual void Visit(ImageReference inline)
         {
-            Write("<img");
-            WriteAttribute("src", inline.LinkReference.Link.Destination.Inlines, true);
-            if (inline.LinkReference.Label == null)
-            {
-                WriteAttribute("alt", inline.LinkReference.Link.Label.Inlines, true);
-            }
-            else
-            {
-                WriteAttribute("alt", inline.LinkReference.Label.Inlines, true);
-            }
-            WriteAttribute("title", inline.LinkReference.Link.Title.Inlines);
-            Write(" />");
+            var label = inline.LinkReference.Label == null ? inline.LinkReference.Link.Label : inline.LinkReference.Label;
+            WriteClosedTag("img",
+                new Attribute("src", inline.LinkReference.Link.Destination.Inlines, true),
+                new Attribute("alt", label.Inlines, true),
+                new Attribute("title", inline.LinkReference.Link.Title.Inlines)
+            );
         }
 
         public virtual void Visit(InlineCode inline)
         {
-            Write("<code>");
+            WriteStartTag("code");
             WriteEscaped(inline.Code);
-            Write("</code>");
+            WriteEndTag("code");
         }
 
         public virtual void Visit(RawHtml inline)

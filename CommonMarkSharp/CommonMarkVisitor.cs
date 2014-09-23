@@ -39,50 +39,6 @@ namespace CommonMarkSharp
             return visitor;
         }
 
-        public static bool Lal(int c)
-        {
-            if (c == 5)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public static bool Slam(char c)
-        {
-            switch (c)
-            {
-                case 'a':
-                case 'b':
-                case 'c':
-                case 's':
-                case 't':
-                case 'A':
-                case 'B':
-                case 'C':
-                case 'S':
-                case 'T':
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public static bool Slam(int c)
-        {
-            switch (c)
-            {
-                case 3:
-                case 4:
-                case 5:
-                case 8:
-                case 9:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         public virtual void VisitPart(Part part)
         {
             if (part == null) throw new ArgumentNullException("part");

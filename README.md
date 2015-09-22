@@ -109,7 +109,7 @@ Once the Markdown has been parsed, it will be in a `Document` object, which is t
 
 One such `CommonMarkVisitor` is the `HtmlRenderer` class. This visitor is used for the default rendering of HTML, and conforms to the [CommonMark](http://commonmark.org/) spec.
 
-If you need to tweek the rendered HTML, you can inherit from `HtmlRenderer`. You might want to wrap the rendered HTML in `<html>`, `<head>` and `<body>`:
+If you need to tweak the rendered HTML, you can inherit from `HtmlRenderer`. You might want to wrap the rendered HTML in `<html>`, `<head>` and `<body>`:
 
 ```csharp
 public class HtmlPageRenderer : HtmlRenderer
